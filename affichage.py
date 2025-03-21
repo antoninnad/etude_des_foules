@@ -67,4 +67,4 @@ class Personne:
                 le canevas sur lequel afficher la personne
         """
 
-        dessiner_cercle(canvas, self.y, self.x, self.rayon, "blue")
+        dessiner_cercle(canvas, self.x, self.y, self.rayon, "blue")

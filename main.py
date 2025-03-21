@@ -11,7 +11,7 @@ tab_personne = []
 arene = configuration()
 
 for x in range(10):
-    tab_personne.append(Personne(random.randint(70,580), random.randint(70,580)))
+    tab_personne.append(Personne(80, x * 30 + 80))
 
 
 
@@ -52,8 +52,6 @@ class app:
         """
             démarre le jeu
         """
-        
-        self.afficher()
 
         self.model()
 
@@ -63,7 +61,7 @@ class app:
             modélise le mouvement des personnes
         """
         for personne in tab_personne:
-            personne.x += random.randint(0,1)
+            personne.x += 1
             personne.y += random.randint(0 ,1)
 
             if personne.x < 70 or personne.x > 580:
