@@ -10,11 +10,35 @@ class configuration:
 
     def __init__(self):
 
+        
+
+        self.x0, self.y0 = (50,50)
+        self.x1, self.y1 = (600,600)
+        self.outlineTaille = 20
+
         self.sortie = {
-            "x": 600,
-            "y": 300,
-            "hauteur": 40
+            "x": self.x1 - self.outlineTaille / 2,
+            "y": self.y1 /2,
+            "hauteur": 30,
         }
+
+        
+
+    def afficher(self, canvas):
+        
+        canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, outline="maroon", width=self.outlineTaille, fill="white")
+
+        canvas.create_rectangle(
+            self.sortie["x"], 
+            self.sortie["y"], 
+            self.sortie["x"] +  self.outlineTaille,
+            self.sortie["y"] + self.sortie["hauteur"], 
+            width=0, 
+            fill="white"
+        )
+
+
+        return
 
 class Personne:
 
@@ -32,7 +56,7 @@ tab_personne = []
 arene = configuration()
 
 for x in range(10):
-    tab_personne.append(Personne(random.randint(0,600), random.randint(0,600)))
+    tab_personne.append(Personne(random.randint(70,580), random.randint(70,580)))
 
 class app:
 
@@ -45,7 +69,7 @@ class app:
       
         self.root.geometry("1400x700")
 
-        self.canvas = tk.Canvas(self.root, width=600 * 2, height=600, bg="white")
+        self.canvas = tk.Canvas(self.root, width=600 * 2, height=700, bg="white")
 
         self.button = tk.Button(self.root, text="Commencer", command=self.start)
 
@@ -54,14 +78,21 @@ class app:
            
         self.root.mainloop()
 
-
-    def start(self):
+    def afficher(self):
         self.canvas.pack()
         self.button.destroy()
+
+        arene.afficher(self.canvas)
 
         for personne in tab_personne:
             personne.afficher(self.canvas)
 
+    
+    def start(self):
+        
+        self.afficher()
+
+        
         
 
 if __name__ == "__main__":
