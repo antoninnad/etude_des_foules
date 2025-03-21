@@ -63,8 +63,8 @@ class app:
             modélise le mouvement des personnes
         """
         for personne in tab_personne:
-            personne.x += random.randint(-4,4)
-            personne.y += random.randint(-4,4)
+            personne.x += random.randint(0,1)
+            personne.y += random.randint(0 ,1)
 
             if personne.x < 70 or personne.x > 580:
                 personne.x = random.randint(70,580)
@@ -73,7 +73,7 @@ class app:
 
 
         self.afficher()
-        self.root.after(100, self.model)
+        self.root.after(15, self.model)
         
         
 
