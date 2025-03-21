@@ -11,7 +11,7 @@ tab_personne = []
 arene = configuration()
 
 for x in range(10):
-    tab_personne.append(Personne(80, x * 30 + 80))
+    tab_personne.append(Personne( [80, x * 30 + 80]))
 
 
 
@@ -61,13 +61,15 @@ class app:
             modélise le mouvement des personnes
         """
         for personne in tab_personne:
-            personne.x += 1
-            personne.y += random.randint(0 ,1)
+            personne.deplacer(1,1)
 
-            if personne.x < 70 or personne.x > 580:
-                personne.x = random.randint(70,580)
-            if personne.y < 70 or personne.y > 580:
-                personne.y = random.randint(70,580)
+            x = personne.coordonnees[0]
+            y = personne.coordonnees[1]
+
+            if x < 70 or x > 580:
+                personne.coordonnees[0] = random.randint(70,580)
+            if y < 70 or y > 580:
+                personne.coordonnees[1] = random.randint(70,580)
 
 
         self.afficher()

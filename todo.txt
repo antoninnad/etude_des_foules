@@ -1,0 +1,3 @@
+utilisation de numpy pour faciliter les opérations vectorielles 
+    | à la place dans personne de mettre x et y
+    | self.coordonne = np.array([x , y]) => facilite les opérations vectorielles

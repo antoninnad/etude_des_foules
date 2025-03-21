@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def dessiner_cercle(canvas, x, y, rayon, couleur):
     """Dessine un cercle sur le canevas."""
     canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, outline=couleur, width=2,fill=couleur)
@@ -54,11 +57,16 @@ class configuration:
 
 class Personne:
 
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, coordonnees):
+        self.coordonnees = np.array(coordonnees) 
         self.rayon = 10
 
+
+    def deplacer(self, dx, dy):
+        """Déplace la personne de (dx, dy)."""
+        self.coordonnees += np.array([dx, dy])
+
+    
     def afficher(self , canvas):
         """
             affiche une personne
@@ -67,4 +75,4 @@ class Personne:
                 le canevas sur lequel afficher la personne
         """
 
-        dessiner_cercle(canvas, self.x, self.y, self.rayon, "blue")
+        dessiner_cercle(canvas, self.coordonnees[0], self.coordonnees[1], self.rayon, "blue")
