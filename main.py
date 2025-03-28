@@ -55,23 +55,27 @@ class app:
 
         self.model()
 
+    def update(self, personne):
+        personne.deplacer(1,1)
+
+        x = personne.coordonnees[0]
+        y = personne.coordonnees[1]
+
+        if x < 70 or x > 580:
+            personne.coordonnees[0] = random.randint(70,580)
+        if y < 70 or y > 580:
+            personne.coordonnees[1] = random.randint(70,580)
+
+
+
     def model(self):
 
         """
             modélise le mouvement des personnes
         """
         for personne in tab_personne:
-            personne.deplacer(1,1)
-
-            x = personne.coordonnees[0]
-            y = personne.coordonnees[1]
-
-            if x < 70 or x > 580:
-                personne.coordonnees[0] = random.randint(70,580)
-            if y < 70 or y > 580:
-                personne.coordonnees[1] = random.randint(70,580)
-
-
+            self.update(personne)
+            
         self.afficher()
         self.root.after(15, self.model)
         
