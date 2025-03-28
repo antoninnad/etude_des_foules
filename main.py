@@ -11,7 +11,11 @@ tab_personne = []
 arene = configuration()
 
 for x in range(10):
-    tab_personne.append(Personne( [80, x * 30 + 80]))
+    tab_personne.append({
+        "x": 100 + 20 * x,
+        "y": 60,
+        "masse": 10
+    })
 
 
 
@@ -44,8 +48,10 @@ class app:
 
         arene.afficher(self.canvas)
 
-        for personne in tab_personne:
-            personne.afficher(self.canvas)
+        for indice,personne in enumerate(tab_personne):
+            
+            
+            dessiner_cercle(self.canvas, personne["x"], personne["y"], 10, "blue")
 
     
     def start(self):
@@ -60,20 +66,24 @@ class app:
         """
             modélise le mouvement des personnes
         """
-        for personne in tab_personne:
-            personne.deplacer(1,1)
 
-            x = personne.coordonnees[0]
-            y = personne.coordonnees[1]
 
-            if x < 70 or x > 580:
-                personne.coordonnees[0] = random.randint(70,580)
-            if y < 70 or y > 580:
-                personne.coordonnees[1] = random.randint(70,580)
+        for indice in range(len(tab_personne)):
+            
+            personne = tab_personne[indice]
+            # deplace une persoone
+
+            tab_personne[indice]["x"] += 1
+            tab_personne[indice]["y"] += 1
+
+            x = personne["x"]
+            y = personne["y"]
+
+        
 
 
         self.afficher()
-        self.root.after(15, self.model)
+        self.root.after(30, self.model)
         
         
 
