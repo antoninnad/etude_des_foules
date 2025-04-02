@@ -1,0 +1,187 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[french]{babel}   % Active la langue française
+\usepackage{graphicx}    	% Pour insérer des images
+\usepackage{lipsum}      	% Pour du texte factice
+\usepackage{fancyhdr}    	% Pour personnaliser les en-têtes et pieds de page
+\usepackage{listings}    	% Pour afficher le code
+\usepackage{xcolor}      	% Pour personnaliser les couleurs
+\usepackage{minted}      	% Pour une coloration syntaxique avancée
+\usepackage{amsmath}     	% Pour les équations
+\usepackage{hyperref}    	% Pour les liens cliquables
+\usepackage{tcolorbox}
+\usepackage{lmodern}
+
+
+\hypersetup{
+	colorlinks=true,   	% Active les liens en couleur
+	linkcolor=blue,    	% Couleur des liens internes
+	urlcolor=blue,     	% Couleur des liens externes
+	citecolor=blue     	% Couleur des liens de citation
+}
+
+
+
+\pagestyle{fancy}  % Active le style personnalisé
+\fancyhf{}  % Efface les en-têtes et pieds de page par défaut
+
+
+\fancyfoot[R]{\includegraphics[width=1.3cm]{logo.png}}
+
+
+% Ajouter la numérotation des pages à droite du pied de page
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+% Afficher la section courante à gauche du pied de page
+\fancyfoot[L]{\nouppercase{\leftmark}}
+
+\begin{document}
+
+% ---- Page de titre ----
+\begin{titlepage}
+	\centering
+	\includegraphics[width=4cm]{logo.png} \\[1cm]  % Ajuste la taille du logo
+
+	{\LARGE \textbf{Etude de la dynamique des foules}} \\[0.5cm]
+    
+	{\large Par le biais de la physique moderne} \\[1.5cm]
+
+	\textbf{Auteurs :} \\[0.3cm]
+	NADAUD Antonin \\
+	JANINI  Raphaël \\
+	LUBIN Thomas \\
+	NUCE LAMOTHE Augustin \\[1cm]
+
+	\textbf{Encadrant :} \\[0.3cm]
+	DESPLAT Lucie \\[1.5cm]
+
+	\textbf{\today}  % Affiche la date du jour
+	\\[2cm]
+
+	\vfill % Remplit l'espace verticalement pour centrer
+
+	{\large CY Tech – préing-2 groupe 2} \\
+
+\end{titlepage}
+
+% --- page blanche ---
+\newpage
+\thispagestyle{empty}  % Pas de numérotation, ni d'en-tête/pied de page
+\mbox{}  % Crée une page vide (avec un espace vide)
+
+% ---- Sommaire ----
+\newpage
+
+
+\renewcommand{\contentsname}{Sommaire}  % Change "Contents" en "Sommaire"
+\tableofcontents  % Génère le sommaire automatiquement avec des liens cliquables
+
+% ---- introduction --- 
+\newpage
+
+
+\section{Situation}
+
+\subsection{Methode de resolution equation}
+
+ % \begin{tcolorbox}[colback=gray!20, colframe=black, colframe=white,sharp corners]
+ 
+ % \end{tcolorbox}
+ 
+\hspace{2em}
+
+\indent Methode utiliser Ruge-Kuta à l'ordre 4
+
+\hspace{2em} 
+
+\begin{minted}[frame=single, bgcolor=white, linenos]{python}
+"""
+param:
+	- nb_pt (entier) nombre de point (100 par défaut)
+	- end (float) fin de l'interval sur [a,b] on prend b
+	- start (float) debut de l'interval
+
+return:
+	tuple de list en premier l'axe x et en 2eme l'axe y	
+"""
+def solve_ordre4(nb_pt = 100, end=10, start=0):
+
+    h = (end - start) / nb_pt
+    x = [0]
+    vitesse = [0]
+    g = 9.81 
+
+    for tn in range(nb_pt):
+
+        f = lambda v : g - v
+
+        k1 = h * f(vitesse[tn])
+        k2 = h * f(vitesse[tn] +  .5 * k1)
+        k3 = h * f(vitesse[tn] +  .5 * k2)
+        k4 = h * f(vitesse[tn] + k3)
+
+        vitesse.append(vitesse[tn] + 1/6 * ( k1 + 2 *k2 + 
+        2 * k3 + k4))
+        
+        x.append(tn * h)
+        
+        return (x,vitesse)
+\end{minted}
+
+
+
+
+
+\subsection{Détails techniques}
+\lipsum[3]
+
+
+
+
+
+
+\section{Explication code}
+\lipsum[4]
+
+Référence à l'équation d'Einstein: \eqref{eq:einstein}
+
+
+\section{Résultats}
+
+\lipsum[5]
+
+
+
+\section{Interprétation}
+\lipsum[5]
+
+
+\section{Analyse}
+
+\lipsum[5]
+
+
+
+\section{Bibliographie}
+
+Voici la liste:
+
+\vspace{1em}
+
+\begin{itemize}
+	\item \href{https://www.example.com}{Exemple 1}
+	\item \href{https://www.google.com}{Google}
+	\item \href{https://www.wikipedia.org}{Wikipedia}
+\end{itemize}
+
+\end{document}
+
+\end{document}
+
+
+pdflatex -shell-escape index.tex
+
+
+
