@@ -22,7 +22,7 @@ class configuration:
         self.sortie = {
             "x": self.x1 - self.outlineTaille / 2,
             "y": self.y1 /2,
-            "hauteur": 30,
+            "hauteur": 50,
         }
 
         self.obstacle = [
