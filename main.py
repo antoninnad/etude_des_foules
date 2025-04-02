@@ -1,7 +1,12 @@
 import tkinter as tk
+from tkinter import messagebox
+
 import random
 import numpy as np
 import math
+import time
+
+
 from affichage import *
 
 
@@ -12,14 +17,14 @@ tab_personne = []
 arene = configuration()
 
 
-for x in range(3):
+for x in range(12):
 
     tab_personne.append({
-        "position": np.array([100 + 30 * x, 70]),
+        "position": np.array([100, 70 + 30 * x]),
         "masse": 10,
-        "vitesse_desiree": 1.34 ,#+ random.randint(-1, 1) * random.randint(0, 25) * .01, 
+        "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
         "vitesse": np.array([0, 0]),
-        "to": .2,
+        "to": .5,
         "rayon": 10 + random.randint(-1, 1) * random.randint(0, 2)
     })
 
@@ -35,7 +40,7 @@ def calcul_ei0(personne):
 
 
     #position de la porte
-    pt_souhaite = np.array([620, 370])
+    pt_souhaite = np.array([624, 335])
     vecteur_ei0 =  pt_souhaite - personne["position"]
 
     norm = np.linalg.norm(vecteur_ei0)
@@ -65,17 +70,18 @@ def euler(personne, step=.02):
 
     f_m = force_motrice(personne)
 
+    #projection sur Ux et Uy
     vitesse_x =  personne["vitesse"][0] + step * f_m[0]
     vitesse_y = personne["vitesse"][1] + step * f_m[1]
 
     
+    #on actualise la position
+    personne["position"] = np.array( [
+        personne["position"][0] + vitesse_x,
+        personne["position"][1] + vitesse_y 
+    ])
 
-    personne["position"][0] = personne["position"][0] + vitesse_x 
-    personne["position"][1] = personne["position"][1] + vitesse_y 
-    
-
-
-
+    # v(t_n+&)
     personne["vitesse"] = np.array([
         vitesse_x,
         vitesse_y
@@ -85,7 +91,7 @@ def euler(personne, step=.02):
 
     print(f"\n\nv= |{vitesse_x}|\n  |{vitesse_y}|")
 
-    #projection sur Ux
+
     
 
 
@@ -106,6 +112,10 @@ class app:
         self.button = tk.Button(self.root, text="Commencer", command=self.start)
         self.button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
+
+        self.temps = tk.Label(self.root, text="Temps 0.0 s", bg="white", fg="black", font=("Arial", 14))
+        
+
            
         self.root.mainloop()
 
@@ -113,8 +123,11 @@ class app:
         """
             dessine chaque persone
         """
+
         self.canvas.pack()
-        self.button.destroy()
+        self.canvas.delete("all")
+
+        
 
         arene.afficher(self.canvas)
 
@@ -134,8 +147,13 @@ class app:
         """
             démarre le jeu
         """
+        self.button.destroy()
+        self.temps.pack(side="left", padx=10, pady=5)
 
+
+        self.debut = time.time()
         self.model()
+        
 
     def model(self):
 
@@ -143,20 +161,31 @@ class app:
             modélise le mouvement des personnes
         """
 
-
-        for indice in range(len(tab_personne)):
-            
-            personne = tab_personne[indice]
-            # deplace une persoone
-
-            euler(personne)
-
-
         
 
+        for indice in range(len(tab_personne)):
 
-        self.afficher()
-        self.root.after(30, self.model)
+            if indice <= (len(tab_personne) - 1):
+            
+                personne = tab_personne[indice]
+            
+                #application physique
+                euler(personne)
+
+                if personne["position"][0] > 623.5:
+                    tab_personne.pop(indice)
+
+        if len(tab_personne) != 0:
+    
+            self.afficher()
+            self.temps["text"] = f"Temps {time.time() - self.debut:.2f} s"
+            self.root.after(30, self.model)
+        
+        else:
+            self.temps["text"] = f"Temps {time.time() - self.debut:.2f} s"
+            messagebox.showinfo("Resultat", f"Fait en {time.time() - self.debut} secondes")
+
+            return
         
         
 
