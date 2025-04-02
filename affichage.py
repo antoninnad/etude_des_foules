@@ -3,7 +3,9 @@ import numpy as np
 
 def dessiner_cercle(canvas, x, y, rayon, couleur):
     """Dessine un cercle sur le canevas."""
+    
     canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, outline=couleur, width=2,fill=couleur)
+    
 
 
 class configuration:
