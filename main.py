@@ -6,7 +6,6 @@ import numpy as np
 import math
 import time
 
-
 from affichage import *
 
 
@@ -17,15 +16,15 @@ tab_personne = []
 arene = configuration()
 
 
-for x in range(12):
+for x in range(15):
 
     tab_personne.append({
         "position": np.array([100, 70 + 30 * x]),
         "masse": 10,
         "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
         "vitesse": np.array([0, 0]),
-        "to": .5,
-        "rayon": 10 + random.randint(-1, 1) * random.randint(0, 2)
+        "to": .2,
+        "rayon": 10 +  random.randint(-2, 2)
     })
 
 
@@ -62,13 +61,72 @@ def force_motrice(personne):
 
     return resultat
 
+def force_intercation_social(personne, indice, b0 = 0.8):
+
+    resultat = 0
+
+    for indice_personne, personne_autre  in enumerate(tab_personne):
+
+        if indice_personne != indice:
+
+            a = personne["position"]
+            b = personne_autre["position"]
+
+            norme_ab = np.linalg.norm(a - b) - personne_autre["rayon"] - personne["rayon"]
+
+            if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
+                print(f"norm {norme_ab}")
+                print(f"\n vect {(a - b)}")
+
+            resultat =  resultat + np.exp((- norme_ab / b0)) * (a - b)
+
+            #print(f"norme: {norme_ab} force {np.exp((- norme_ab / .08)) * (a - b)}")
+    return resultat
 
 
+def angle_between_vectors(u, v):
+    dot_product = np.dot(u, v)
+    norm_u = np.linalg.norm(u)
+    norm_v = np.linalg.norm(v)
+    cos_theta = dot_product / (norm_u * norm_v)
+
+    return np.arccos(np.clip(cos_theta, -1.0, 1.0)) 
+
+def distance_mur_vect(coord_a, coord_b,  coord_personne):
+
+    AP = coord_personne - coord_a
+    AB = coord_b - coord_a
+
+    alpha = angle_between_vectors(AP,AB)
+
+    
+    PE = np.linalg.norm(AP) * np.sin(alpha)
 
 
-def euler(personne, step=.02):
+def force_intercation_social_mur(personne, indice, b0 = 0.8):
+
+    coord_a = np.array([50, 50])
+    coord_b = np.array([600,50])
+    coord_c = np.array([600,600])
+    coord_d = np.array([50, 600])
+
+
+    print(distance_mur_vect(coord_b, coord_c, personne["position"]))
+
+    return 0
+
+
+def euler(personne,indice, step=.02):
 
     f_m = force_motrice(personne)
+
+    a = force_intercation_social(personne, indice)
+
+    f_m += force_intercation_social_mur(personne , indice)
+
+    
+    
+    f_m += a
 
     #projection sur Ux et Uy
     vitesse_x =  personne["vitesse"][0] + step * f_m[0]
@@ -87,9 +145,9 @@ def euler(personne, step=.02):
         vitesse_y
     ])
 
-    print(personne["position"])
+    #print(personne["position"])
 
-    print(f"\n\nv= |{vitesse_x}|\n  |{vitesse_y}|")
+    #print(f"\n\nv= |{vitesse_x}|\n  |{vitesse_y}|")
 
 
     
@@ -170,7 +228,7 @@ class app:
                 personne = tab_personne[indice]
             
                 #application physique
-                euler(personne)
+                euler(personne, indice)
 
                 if personne["position"][0] > 623.5:
                     tab_personne.pop(indice)
