@@ -48,13 +48,14 @@ def force_motrice(personne):
 
     return resultat
 
-def force_intercation_social(tab_personne, personne, indice, b0 = config["b0"]):
+def force_intercation_social(tab_personne, personne, indice, b0 = config["b0"], seuil_interaction = 50):
 
     resultat = 0
 
+
     for indice_personne, personne_autre  in enumerate(tab_personne):
 
-        if indice_personne != indice:
+        if indice_personne != indice and  np.linalg.norm(personne_autre["position"] - personne["position"]) < seuil_interaction:
 
             a = personne["position"]
             b = personne_autre["position"]
@@ -113,9 +114,6 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
     
         resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
 
-
-
-
     mur_ab = distance_mur_vect(coord_a, coord_b, personne)
     
     resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
@@ -131,8 +129,55 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
 
     return resultat
 
+def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 
-def euler(tab_personne, personne,indice, step=.02):
+    x = rectangle["x"]
+    y = rectangle["y"]
+    h = rectangle["hauteur"]
+    l = rectangle["longueur"]
+
+    coord_x = personne["position"][0]
+    coord_y = personne["position"][1]
+
+    coord_a = np.array([x, y])
+    coord_b = np.array([x + l,y])
+    coord_c = np.array([x,y + h])
+    coord_d = np.array([x + l, y + h])
+    resultat = 0
+    
+    # mur_bc = distance_mur_vect(coord_b, coord_c, personne)
+    
+    # resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
+
+    # mur_ab = distance_mur_vect(coord_a, coord_b, personne)
+    
+    # resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
+
+    if   x - h < coord_y and x + h > coord_y:  
+
+        mur_ad = distance_mur_vect(coord_a, coord_d, personne)
+
+        
+        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1]
+
+    # mur_dc = distance_mur_vect(coord_d, coord_c, personne)
+
+    # resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] 
+
+    return resultat
+
+def force_interaction_obstacle(personne, obstacles):
+
+    for obstacle in obstacles:
+
+        if obstacle["type"] == "rectangle":
+
+            return force_intercation_rectangle(personne, obstacle)
+
+def euler(tab_personne, personne,indice,obstacles, step=.02):
+    """
+        pb physique
+    """
 
     f_m = force_motrice(personne)
 
@@ -141,6 +186,8 @@ def euler(tab_personne, personne,indice, step=.02):
     
     
     f_m += force_intercation_social(tab_personne, personne, indice)
+
+    #f_m += force_interaction_obstacle(personne, obstacles)
 
     #projection sur Ux et Uy
     vitesse_x =  personne["vitesse"][0] + step * f_m[0]
