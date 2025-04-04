@@ -13,30 +13,33 @@ from affichage import *
 
 # partie principale
 
+class Personne:
+    def __init__(self, x, y):
+        self.position = np.array([x, y])
+        self.masse = 10
+        self.vitesse_desiree = 1.34 + random.randint(-1, 1) * random.randint(0, 25) * 0.01
+        self.vitesse = np.array([0.0, 0.0])
+        self.to = 0.2
+        self.rayon = 10 + random.randint(-2, 2)
+
+    def __repr__(self):
+        return f"Personne(pos={self.position}, vit={self.vitesse})"
+
 tab_personne = []
 
 arene = configuration()
 
-def initialiser_tab_personne():
-
-    tab = []
-
+def initialiser_personnes():
+    personnes = []
     for y in range(3):
         for x in range(15):
+            personne = Personne(100 + 30 * y, 70 + 30 * x)
+            personnes.append(personne)
 
-            tab.append({
-                "position": np.array([100 + 30 * y, 70 + 30 * x]),
-                "masse": 10,
-                "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
-                "vitesse": np.array([0, 0]),
-                "to": .2,
-                "rayon": 10 +  random.randint(-2, 2)
-            })
+    return personnes
 
+tab_personne = initialiser_personnes()
 
-    return tab
-
-tab_personne = initialiser_tab_personne()
 
 
 class app:
@@ -122,9 +125,9 @@ class app:
             
             dessiner_cercle(
                 self.canvas, 
-                personne["position"][0], # x
-                personne["position"][1], # y
-                personne["rayon"], 
+                personne.position[0], # x
+                personne.position[1], # y
+                personne.rayon, 
                 "blue"
             )
 
@@ -164,7 +167,7 @@ class app:
                 #application physique
                 euler(tab_personne, personne, indice, arene.obstacles)
 
-                if personne["position"][0] > 610:
+                if personne.position[0] > 610:
                     tab_personne.pop(indice)
 
 

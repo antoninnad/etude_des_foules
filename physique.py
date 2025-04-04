@@ -27,7 +27,7 @@ def calcul_ei0(personne):
 
     #position de la porte
     pt_souhaite = np.array([624, 335])
-    vecteur_ei0 =  pt_souhaite - personne["position"]
+    vecteur_ei0 =  pt_souhaite - personne.position
 
     norm = np.linalg.norm(vecteur_ei0)
 
@@ -42,9 +42,9 @@ def calcul_ei0(personne):
 
 def force_motrice(personne):
 
-    resultat = personne["vitesse_desiree"] * calcul_ei0(personne) - personne["vitesse"]
+    resultat = personne.vitesse_desiree * calcul_ei0(personne) - personne.vitesse
 
-    resultat = resultat /  personne["to"]
+    resultat = resultat /  personne.to
 
     return resultat
 
@@ -55,12 +55,12 @@ def force_intercation_social(tab_personne, personne, indice, b0 = config["b0"], 
 
     for indice_personne, personne_autre  in enumerate(tab_personne):
 
-        if indice_personne != indice and  np.linalg.norm(personne_autre["position"] - personne["position"]) < seuil_interaction:
+        if indice_personne != indice and  np.linalg.norm(personne_autre.position - personne.position) < seuil_interaction:
 
-            a = personne["position"]
-            b = personne_autre["position"]
+            a = personne.position
+            b = personne_autre.position
 
-            norme_ab = np.linalg.norm(a - b) - personne_autre["rayon"] - personne["rayon"]
+            norme_ab = np.linalg.norm(a - b) - personne_autre.rayon - personne.rayon
 
             if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
                 print(f"norm {norme_ab}")
@@ -82,7 +82,7 @@ def angle_between_vectors(u, v):
 
 def distance_mur_vect(coord_a, coord_b,  personne):
 
-    coord_personne = personne["position"]
+    coord_personne = personne.position
 
     AP = coord_personne - coord_a
     AB = coord_b - coord_a
@@ -90,7 +90,7 @@ def distance_mur_vect(coord_a, coord_b,  personne):
     alpha = angle_between_vectors(AP,AB)
 
     
-    PE = (np.linalg.norm(AP) * np.sin(alpha) - personne["rayon"]) 
+    PE = (np.linalg.norm(AP) * np.sin(alpha) - personne.rayon) 
 
 
     vecteur_normal = orthogonal_vector(AB)
@@ -109,7 +109,7 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
     resultat = 0
     
     
-    if not (personne["position"][1] > 310 and personne["position"][1] < 340) and personne["position"][0] < 600 - personne["rayon"]:
+    if not (personne.position[1] > 310 and personne.position[1] < 340) and personne.position[0] < 600 - personne.rayon:
         mur_bc = distance_mur_vect(coord_b, coord_c, personne)
     
         resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
@@ -136,8 +136,8 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
     h = rectangle["hauteur"]
     l = rectangle["longueur"]
 
-    coord_x = personne["position"][0]
-    coord_y = personne["position"][1]
+    coord_x = personne.position[0]
+    coord_y = personne.position[1]
 
     coord_a = np.array([x, y])
     coord_b = np.array([x + l,y])
@@ -187,21 +187,21 @@ def euler(tab_personne, personne,indice,obstacles, step=.02):
     
     f_m += force_intercation_social(tab_personne, personne, indice)
 
-    #f_m += force_interaction_obstacle(personne, obstacles)
+    # f_m += force_interaction_obstacle(personne, obstacles)
 
     #projection sur Ux et Uy
-    vitesse_x =  personne["vitesse"][0] + step * f_m[0]
-    vitesse_y = personne["vitesse"][1] + step * f_m[1]
+    vitesse_x =  personne.vitesse[0] + step * f_m[0]
+    vitesse_y = personne.vitesse[1] + step * f_m[1]
 
     
     #on actualise la position
-    personne["position"] = np.array( [
-        personne["position"][0] + vitesse_x,
-        personne["position"][1] + vitesse_y 
+    personne.position = np.array( [
+        personne.position[0] + vitesse_x,
+        personne.position[1] + vitesse_y 
     ])
 
     # v(t_n+&)
-    personne["vitesse"] = np.array([
+    personne.vitesse = np.array([
         vitesse_x,
         vitesse_y
     ])
