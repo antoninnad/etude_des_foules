@@ -17,17 +17,17 @@ tab_personne = []
 
 arene = configuration()
 
+for y in range(3):
+    for x in range(15):
 
-for x in range(15):
-
-    tab_personne.append({
-        "position": np.array([100, 70 + 30 * x]),
-        "masse": 10,
-        "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
-        "vitesse": np.array([0, 0]),
-        "to": .2,
-        "rayon": 10 +  random.randint(-2, 2)
-    })
+        tab_personne.append({
+            "position": np.array([100 + 30 * y, 70 + 30 * x]),
+            "masse": 10,
+            "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
+            "vitesse": np.array([0, 0]),
+            "to": .2,
+            "rayon": 10 +  random.randint(-2, 2)
+        })
 
 
 class app:
@@ -49,10 +49,20 @@ class app:
 
 
         self.temps = tk.Label(self.root, text="Temps 0.0 s", bg="white", fg="black", font=("Arial", 14))
+        self.nombre = len(tab_personne)
         
+        self.particule = tk.Label(self.root, text=f"Particule {self.nombre}/{self.nombre}", bg="white", fg="black", font=("Arial", 14))
+        self.restart = tk.Button(self.root, text="Restart", command=self.start)
 
+        self.stop = False
+        self.stopBtn = tk.Button(self.root, text="Stop", command=self.stop_action)
            
+
+
         self.root.mainloop()
+
+    def stop_action(self):
+        self.stop = not self.stop
 
     def afficher(self):
         """
@@ -84,7 +94,8 @@ class app:
         """
         self.button.destroy()
         self.temps.pack(side="left", padx=10, pady=5)
-
+        self.particule.pack(side="left", padx=10, pady=25)
+        self.stopBtn.place(x= 10,y= 10)
 
         self.debut = time.time()
         self.model()
@@ -95,7 +106,9 @@ class app:
         """
             modélise le mouvement des personnes
         """
-
+        if self.stop:
+            self.root.after(30, self.model)
+            return
         
 
         for indice in range(len(tab_personne)):
@@ -107,8 +120,11 @@ class app:
                 #application physique
                 euler(tab_personne, personne, indice)
 
-                if personne["position"][0] > 623.5:
+                if personne["position"][0] > 610:
                     tab_personne.pop(indice)
+
+
+        self.particule["text"] = f"Particule {len(tab_personne)}/{self.nombre}"
 
         if len(tab_personne) != 0:
     

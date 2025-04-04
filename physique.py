@@ -108,7 +108,7 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
     resultat = 0
     
     
-    if not (personne["position"][1] > 300 and personne["position"][1] < 350):
+    if not (personne["position"][1] > 310 and personne["position"][1] < 340) and personne["position"][0] < 600 - personne["rayon"]:
         mur_bc = distance_mur_vect(coord_b, coord_c, personne)
     
         resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
