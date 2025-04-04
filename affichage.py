@@ -3,7 +3,9 @@ import numpy as np
 
 def dessiner_cercle(canvas, x, y, rayon, couleur):
     """Dessine un cercle sur le canevas."""
+    
     canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, outline=couleur, width=2,fill=couleur)
+    
 
 
 class configuration:
@@ -22,17 +24,28 @@ class configuration:
         self.sortie = {
             "x": self.x1 - self.outlineTaille / 2,
             "y": self.y1 /2,
-            "hauteur": 30,
+            "hauteur": 50,
         }
 
-        self.obstacle = [
-            {"x": 100, "y": 100, "taille": 30,"type": "rectangle"},
-            {"x": 500, "y": 500, "rayon": 40, "type": "cercle"},
-            {"x": 300, "y": 300, "rayon": 20, "type": "cercle"},
-            {"x": 200, "y": 600, "rayon": 10, "type": "cercle"},
-            {"x": 400, "y": 200, "rayon": 50, "type": "cercle"}
+        self.obstacles = [
+            # {"x": 400, "y": 250, "longueur": 40, "hauteur": 50,"type": "rectangle", "couleur": "purple"},
         ]
-        
+    
+    def dessiner_obstacles(self, canvas):
+        """
+        Dessine une liste d'obstacles sur un Canvas Tkinter.
+
+        :param canvas: Le widget Canvas Tkinter
+        :param obstacles: Liste de dictionnaires représentant les obstacles
+        """
+        for obstacle in self.obstacles:
+            x, y = obstacle["x"], obstacle["y"]
+            couleur = obstacle["couleur"]
+
+            if obstacle["type"] == "rectangle":
+                longueur, hauteur = obstacle["longueur"], obstacle["hauteur"]
+                canvas.create_rectangle(x, y, x + longueur, y + hauteur, fill=couleur)
+
 
     def afficher(self, canvas):
         """
@@ -54,25 +67,4 @@ class configuration:
             fill="white"
         )
 
-
-class Personne:
-
-    def __init__(self, coordonnees):
-        self.coordonnees = np.array(coordonnees) 
-        self.rayon = 10
-
-
-    def deplacer(self, dx, dy):
-        """Déplace la personne de (dx, dy)."""
-        self.coordonnees += np.array([dx, dy])
-
-    
-    def afficher(self , canvas):
-        """
-            affiche une personne
-
-            parametre: 
-                le canevas sur lequel afficher la personne
-        """
-
-        dessiner_cercle(canvas, self.coordonnees[0], self.coordonnees[1], self.rayon, "blue")
+        self.dessiner_obstacles(canvas)
