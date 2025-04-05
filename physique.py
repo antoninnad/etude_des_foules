@@ -3,7 +3,7 @@ import math
 
 
 config = {
-    "b0": 3
+    "b0": 4
 }
 
 
@@ -97,6 +97,7 @@ def distance_mur_vect(coord_a, coord_b,  personne):
 
     resultat = PE
 
+
     return resultat, vecteur_normal
 
 
@@ -135,14 +136,16 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
     y = rectangle["y"]
     h = rectangle["hauteur"]
     l = rectangle["longueur"]
+    rayon = personne["rayon"] 
 
-    coord_x = personne["position"][0]
-    coord_y = personne["position"][1]
+    coord_x = personne["position"][0] + rayon
+    coord_y = personne["position"][1] + rayon
+
 
     coord_a = np.array([x, y])
     coord_b = np.array([x + l,y])
-    coord_c = np.array([x,y + h])
-    coord_d = np.array([x + l, y + h])
+    coord_c = np.array([x + l,y + h])
+    coord_d = np.array([x , y + h])
     resultat = 0
     
     # mur_bc = distance_mur_vect(coord_b, coord_c, personne)
@@ -153,16 +156,27 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
     
     # resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
 
-    if   x - h < coord_y and x + h > coord_y:  
+    # print(f"y + h= {y + h} y={y} coord={coord_y}")
 
-        mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-
+    if coord_y > y and coord_y < y + h + 2 * rayon and coord_x < x:
         
-        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1]
+        mur_ad = distance_mur_vect(coord_a, coord_d, personne)
+        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] 
 
-    # mur_dc = distance_mur_vect(coord_d, coord_c, personne)
+    if coord_x - 2 * rayon > x and coord_x - 2 * rayon < x + l and coord_y > y:
 
-    # resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] 
+        mur_ab = distance_mur_vect(coord_a, coord_b, personne)
+        
+        resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1] * -1
+
+
+    if coord_x - 2 * rayon > x and coord_x < x + l and coord_y > y:
+
+        mur_dc = distance_mur_vect(coord_d, coord_c, personne)
+
+        resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] 
+
+    
 
     return resultat
 
@@ -187,7 +201,7 @@ def euler(tab_personne, personne,indice,obstacles, step=.02):
     
     f_m += force_intercation_social(tab_personne, personne, indice)
 
-    #f_m += force_interaction_obstacle(personne, obstacles)
+    f_m += force_interaction_obstacle(personne, obstacles)
 
     #projection sur Ux et Uy
     vitesse_x =  personne["vitesse"][0] + step * f_m[0]

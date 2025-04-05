@@ -25,7 +25,7 @@ def initialiser_tab_personne():
         for x in range(15):
 
             tab.append({
-                "position": np.array([100 + 30 * y, 70 + 30 * x]),
+                "position": np.array([100 + 30 * y, 100 + 30 * x]),
                 "masse": 10,
                 "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
                 "vitesse": np.array([0, 0]),
@@ -69,7 +69,7 @@ class app:
         self.vitesse = 1
 
         self.slider = tk.Scale(self.root, from_=0, to=100, orient="horizontal", length=200, command=self.augmenter_vitesse)
-        self.slider.set(100)  # Valeur initiale
+        self.slider.set(53)  # Valeur initiale
 
         
         self.root.mainloop()
@@ -98,7 +98,8 @@ class app:
         self.debut = 0
         self.nombre = len(tab_personne)
         self.particule["text"] = f"Personnes {self.nombre}/{self.nombre}"
-        self.afficher()
+
+
         self.model()
 
 

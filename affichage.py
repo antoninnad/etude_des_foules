@@ -28,7 +28,7 @@ class configuration:
         }
 
         self.obstacles = [
-            # {"x": 400, "y": 250, "longueur": 40, "hauteur": 50,"type": "rectangle", "couleur": "purple"},
+            {"x": 400, "y": 250, "longueur": 50, "hauteur": 30,"type": "rectangle", "couleur": "purple"},
         ]
     
     def dessiner_obstacles(self, canvas):
