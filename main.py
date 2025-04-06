@@ -15,7 +15,7 @@ from affichage import *
 
 tab_personne = []
 
-arene = configuration()
+
 
 def initialiser_tab_personne():
 
@@ -53,8 +53,11 @@ class app:
         self.canvas = tk.Canvas(self.root, width=600 * 2, height=700, bg="white")
 
         #bouton lié à l'evt start
-        self.button = tk.Button(self.root, text="Commencer model 1", command=self.start)
-        self.button.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.button = tk.Button(self.root, text="Commencer simulation basique", command=self.start2)
+        self.button.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+
+        self.button2 = tk.Button(self.root, text="Commencer simulation obsatcles", command=self.start)
+        self.button2.place(relx=0.5, rely=0.55, anchor=tk.CENTER)
 
 
         self.temps = tk.Label(self.root, text="Temps 0.0 s", bg="white", fg="black", font=("Arial", 14))
@@ -116,7 +119,7 @@ class app:
 
         
 
-        arene.afficher(self.canvas)
+        self.arene.afficher(self.canvas)
 
         for indice,personne in enumerate(tab_personne):
             
@@ -129,12 +132,12 @@ class app:
                 "blue"
             )
 
-    
-    def start(self):
+    def start2(self):
         """
-            démarre le jeu
+            démarre la simulation
         """
         self.button.destroy()
+        self.button2.destroy()
 
         self.temps.pack(side="left", padx=10, pady=5)
         self.particule.pack(side="left", padx=10, pady=25)
@@ -142,6 +145,27 @@ class app:
         self.restart.place(x= 10,y=50)
         self.slider.place(x=10,y=80)
 
+        self.arene = configuration()
+
+        self.arene.obstacles = []
+        
+        self.debut = 0
+        self.model()
+    
+    def start(self):
+        """
+            démarre la simulation
+        """
+        self.button.destroy()
+        self.button2.destroy()
+
+        self.temps.pack(side="left", padx=10, pady=5)
+        self.particule.pack(side="left", padx=10, pady=25)
+        self.stopBtn.place(x= 10,y= 10)
+        self.restart.place(x= 10,y=50)
+        self.slider.place(x=10,y=80)
+
+        self.arene = configuration()
         
         self.debut = 0
         self.model()
@@ -194,7 +218,7 @@ class app:
                 personne = tab_personne[indice]
             
                 #application physique
-                euler(tab_personne, personne, indice, arene.obstacles)
+                euler(tab_personne, personne, indice, self.arene.obstacles)
 
                 if personne["position"][0] > 610:
                     tab_personne.pop(indice)
