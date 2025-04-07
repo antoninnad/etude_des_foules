@@ -12,7 +12,7 @@
 
 ## Arborescence
   main.py
-  |-> fichier principal avec l'affichage
+  \|-> fichier principal avec l'affichage
   configuration.py
   |-> pour l'affichage de la situation
   physique.py
