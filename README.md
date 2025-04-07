@@ -11,9 +11,9 @@
 ```
 
 ## Arborescence
-main.py
-|-> fichier principal avec l'affichage
-configuration.py
-|-> pour l'affichage de la situation
-physique.py
-|-> toutes les règles physique
+main.py  
+|-> fichier principal avec l'affichage  
+configuration.py  
+|-> pour l'affichage de la situation  
+physique.py  
+|-> toutes les règles physique  
