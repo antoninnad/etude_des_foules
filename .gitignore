@@ -3,5 +3,4 @@ __pycache__/
 rendu.dvi
 rendu.aux
 rendu.out
-rendu.out
-rendu.out
+rendu.log
