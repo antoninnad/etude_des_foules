@@ -31,6 +31,7 @@ def initialiser_tab_personne():
                 "vitesse": np.array([0, 0]),
                 "to": .2,
                 "rayon": 10 +  random.randint(-2, 2)
+
             })
 
 
@@ -222,7 +223,6 @@ class app:
 
                 if personne["position"][0] > 610:
                     tab_personne.pop(indice)
-
 
         self.particule["text"] = f"Personnes {len(tab_personne)}/{self.nombre}"
 

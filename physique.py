@@ -103,6 +103,7 @@ def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], se
 
     for indice_personne, personne_autre in enumerate(tab_personne):
         if indice_personne != indice and np.linalg.norm(personne_autre["position"] - personne["position"]) < seuil_interaction:
+
             a = personne["position"]
             b = personne_autre["position"]
 
@@ -144,6 +145,7 @@ def angle_entre_vecteur(u, v):
         - resultat (float) : La distance perpendiculaire de la personne au segment de mur,
           ajusté en soustrayant le rayon de la personne.
         - vecteur_normal (numpy.ndarray) : Le vecteur normal au segment de mur.
+        - AE (float) : Distance sur l'axe AB pour l'évitement
 
 """
 
@@ -165,7 +167,9 @@ def distance_mur_vect(coord_a, coord_b, personne):
     resultat = PE
 
 
-    return resultat, vecteur_normal
+    AE = math.sqrt(np.linalg.norm(AP) ** 2 -  np.linalg.norm(PE) ** 2)
+
+    return resultat, vecteur_normal, AE
 
 
 def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
@@ -229,7 +233,24 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
     if coord_y > y and coord_y < y + h + 2 * rayon and coord_x < x:
         
         mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] 
+        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1]
+
+        # ajout force contournement
+        if mur_ad[0] < 20:
+            ad = coord_a - coord_d
+
+            signe = 1
+
+            
+            #pour de faire aller la force vers le haut ou vers le vas
+            if mur_ad[2] > h/2:
+                signe = -1
+
+            ad = normalize_vector(ad) * 10 * signe
+
+            resultat += ad
+
+
 
     if coord_x - 2 * rayon > x and coord_x - 2 * rayon < x + l and coord_y > y:
 
