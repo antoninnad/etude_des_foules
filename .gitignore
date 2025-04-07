@@ -1,6 +1,9 @@
 # ignore pycache
 __pycache__/
+_minted-rendu/
 rendu.dvi
 rendu.aux
 rendu.out
 rendu.log
+rendu.toc
+rendu.synctex.gz
