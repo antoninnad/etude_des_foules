@@ -5,7 +5,7 @@
 ## Pour lancer le projet
 
 ```bash
-  git clone <nom-repo>
+  git clone https://github.com/antoninnad/etude_des_foules.git
   cd etudes-foules
   python3 main.py
 ```
