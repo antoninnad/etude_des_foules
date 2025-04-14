@@ -97,14 +97,12 @@ class app:
     def restart_action(self):
 
         global tab_personne
-
+        tab_personne.clear()
         tab_personne = initialiser_tab_personne()
         self.debut = 0
         self.nombre = len(tab_personne)
-        self.particule["text"] = f"Personnes {self.nombre}/{self.nombre}"
 
-
-        self.model()
+        self.stop = False
 
 
     def stop_action(self):
