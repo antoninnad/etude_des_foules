@@ -95,13 +95,16 @@ class app:
         self.vitesse = float(display_val)
 
     def restart_action(self):
-
+        
         global tab_personne
+        lenPreReset = len(tab_personne)
         tab_personne.clear()
         tab_personne = initialiser_tab_personne()
         self.debut = 0
         self.nombre = len(tab_personne)
 
+        if (lenPreReset==0):
+            self.model()
         self.stop = False
 
 
@@ -175,31 +178,8 @@ class app:
 
         x = personne.coordonnees[0]
         y = personne.coordonnees[1]
-    def model(self):
 
-        """
-            modélise le mouvement des personnes
-        """
-
-
-        for indice in range(len(tab_personne)):
-            
-            personne = tab_personne[indice]
-            # deplace une persoone
-
-        if x < 70 or x > 580:
-            personne.coordonnees[0] = random.randint(70,580)
-        if y < 70 or y > 580:
-            personne.coordonnees[1] = random.randint(70,580)
-            tab_personne[indice]["x"] += 1
-            tab_personne[indice]["y"] += 1
-
-            x = personne["x"]
-            y = personne["y"]
-
-        
-
-
+    
 
     def model(self):
 
