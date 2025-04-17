@@ -7,7 +7,6 @@ def dessiner_cercle(canvas, x, y, rayon, couleur):
     canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, outline=couleur, width=2,fill=couleur)
     
 
-
 class configuration:
 
     def __init__(self):
@@ -19,20 +18,65 @@ class configuration:
 
         #taille contours
         self.outlineTaille = 20
-        
-        #porte
-        self.sortie = {
-            "x": self.x1 - self.outlineTaille / 2,
-            "y": self.y1 /2,
-            "hauteur": 50,
-        }
 
-        #defintion des obstacles
+        self.obstacles = []
+    
+    def placeporte(self, portes):
+        for porte in portes:
+            self.sortie = {
+                "x": porte[0] - 34,
+                "y": porte[1] - 35,
+                "hauteur": 50,
+            }
+
+    def ajout_obstacles(self):
         self.obstacles = [
             {"x": 400, "y": 250, "longueur": 50, "hauteur": 90,"type": "rectangle", "couleur": "purple"},
             {"x": 480, "y": (self.y1+50)/2, "rayon": 30,"type": "cercle", "couleur": 'black'}
         ]
-    
+
+    def ajout_class(self):
+        self.obstacles = [
+            {"x": 100, "y": 110, "longueur": 100, "hauteur": 35,"type": "rectangle", "couleur": "purple"},
+            {"x": 180, "y": 60, "longueur": 300, "hauteur": 10,"type": "rectangle", "couleur": "black"},
+
+            {"x": 90 , "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            
+        ]
+
     def dessiner_obstacles(self, canvas):
         """
         Dessine une liste d'obstacles sur un Canvas Tkinter.

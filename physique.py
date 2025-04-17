@@ -40,14 +40,11 @@ def orthogonal_vector(vector):
 """
 def calcul_ei0(personne):
     
-    #position de la porte
-    pt_souhaite = np.array([624, 335])
-    # pour tester les murs horizontaux
-    # pt_souhaite = np.array([624, 935]) 
-
+    #position desiree
+    pt_souhaite = personne["destination"]
     #direction 
     vecteur_ei0 =  pt_souhaite - personne["position"]
-
+    vecteur_ei0 = [0, 1] if all(vecteur_ei0 == [0, 0]) else vecteur_ei0
     # normalisation du vecteur
     norm = np.linalg.norm(vecteur_ei0)
     vecteur_ei0 = vecteur_ei0 / norm
@@ -111,9 +108,9 @@ def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], se
 
             norme_ab = np.linalg.norm(a - b) - personne_autre["rayon"] - personne["rayon"]
 
-            if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
-                print(f"norm {norme_ab}")
-                print(f"\n vect {(a - b)}")
+            # if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
+            #     print(f"norm {norme_ab}")
+            #     print(f"\n vect {(a - b)}")
 
             resultat = resultat + np.exp((- norme_ab / b0)) * (a - b)
 
@@ -357,20 +354,33 @@ def force_intercation_cercle(personne, cercle, b0=config["b0"]):
     	
     return resultat
 
+
+def force_intercation_cercle(personne, cercle, b0=config["b0"]):
+    
+    resultat = np.array([0, 0])
+    
+    o = np.array([cercle["x"], cercle["y"]])
+    i = personne["position"]
+    
+    distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
+    
+    resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
+    	
+    return resultat
+
 def force_interaction_obstacle(personne, obstacles):
-
-    acc = np.array([0., 0.])
+    accumulateur = 0
     for obstacle in obstacles:
-
         if obstacle["type"] == "rectangle":
 
-            acc += force_intercation_rectangle(personne, obstacle)
+            accumulateur += force_intercation_rectangle(personne, obstacle)
             
         elif obstacle["type"] == "cercle":
 
-            acc += force_intercation_cercle(personne, obstacle)
+            accumulateur += force_intercation_cercle(personne, obstacle)
 
-    return acc
+
+    return accumulateur
 
 
 """
