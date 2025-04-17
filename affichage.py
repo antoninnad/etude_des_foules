@@ -30,6 +30,7 @@ class configuration:
         #defintion des obstacles
         self.obstacles = [
             {"x": 400, "y": 250, "longueur": 50, "hauteur": 90,"type": "rectangle", "couleur": "purple"},
+            {"x": 480, "y": (self.y1+50)/2, "rayon": 30,"type": "cercle", "couleur": 'black'}
         ]
     
     def dessiner_obstacles(self, canvas):
@@ -46,6 +47,10 @@ class configuration:
             if obstacle["type"] == "rectangle":
                 longueur, hauteur = obstacle["longueur"], obstacle["hauteur"]
                 canvas.create_rectangle(x, y, x + longueur, y + hauteur, fill=couleur)
+                
+            elif obstacle["type"] == "cercle":
+                r = obstacle["rayon"]
+                canvas.create_oval(obstacle["x"]-r, obstacle["y"]-r, obstacle["x"]+r, obstacle["y"]+r, width=5)
 
 
     def afficher(self, canvas):
