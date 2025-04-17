@@ -197,50 +197,13 @@ def _distance_mur_vect(mur_pos1 : np.array, mur_pos2 : np.array, personne : dict
     return mur_pos1 + k * mur_len_normaliser
     
     
-    
-# v2_normalize(v2_diff(closest, self->pos));    
-
+   
 def normalize(v):
     norm = np.linalg.norm(v)
     if norm == 0: 
        return v
     return v / norm
 
-def _force_intercation_social_mur(personne, indice, b0 = config["b0"]):
-
-    # une liste de pair de possition (x,y)
-    murs = [
-        [np.array([50, 50]),   np.array([600, 50 ])], # haut
-        [np.array([50, 50]),   np.array([50,  600])], # gauche
-        [np.array([600, 600]), np.array([50,  600])], # bas
-        [np.array([600, 50]),  np.array([600, 380])], # droite haut
-        [np.array([600, 320]), np.array([600, 600])], # droite bas
-    ]
-    murs_rayon = 10
-    
-    force = 0
-    
-    # mur_ab = _distance_mur_vect(coord_a, coord_b, personne)
-    # normaliz
-    
-    for mur in murs:
-        n_proche = 0
-        n_i_self = normalize(n_proche - personne["position"])
-        distance_min_mur_personne = murs_rayon + personne["rayon"] - np.linalg.norm(n_proche - personne["position"])
-        resultat += np.exp(distance_min_mur_personne / b0) * n_i_self
-
-
-
-    mur_ad = _distance_mur_vect(coord_a, coord_d, personne)
-
-    
-    resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
-
-    mur_dc = _distance_mur_vect(coord_d, coord_c, personne)
-
-    resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
-
-    return resultat
 
 def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
 
@@ -272,14 +235,67 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
 
     return resultat
 
+
+def point_le_plus_proche_rectangle(personne : dict, rectangle : dict) -> np.array:
+    # vecteur mur (un sommet) -> personne
+    pers_mur = personne["position"] - np.array([rectangle["x"], rectangle["y"]])
+    
+    # le vecteur pour désigner la longeur du mur 
+    # pourra dans le future, ne pas être aligner aux axes x y
+    vecteur_mur1 = np.array([rectangle["longueur"], 0.])
+    
+    # le vecteur pour désigner la largeur du mur 
+    vecteur_mur2 = np.array([0., rectangle["hauteur"]])
+    
+    # vérifie si personne n'est pas dans le mur
+    est_pas_dans_mur = False
+    
+    
+    k1 = np.dot(pers_mur, normalize(vecteur_mur1))
+    if (k1 < 0.):
+        k1 = 0.
+        est_pas_dans_mur = True
+    
+    vecteur_mur1_longeur = np.linalg.norm(vecteur_mur1)
+    if (k1 > vecteur_mur1_longeur):
+        k1 = vecteur_mur1_longeur
+        est_pas_dans_mur = True
+    
+    k2 = np.dot(pers_mur, normalize(vecteur_mur2))
+    if (k2 < 0.):
+        k2 = 0.
+        est_pas_dans_mur = True
+    
+    vecteur_mur2_longeur = np.linalg.norm(vecteur_mur2)
+    if (k2 > vecteur_mur2_longeur):
+        k2 = vecteur_mur2_longeur
+        est_pas_dans_mur = True
+        
+    return (
+        np.array([rectangle["x"], rectangle["y"]])
+      + k1 * (vecteur_mur1)/ vecteur_mur1_longeur
+      + k2 * (vecteur_mur2)/ vecteur_mur2_longeur
+    )
+        
+# donne le vecteur de répulsion d'un rectangle sur une personne
+# facilement modifible pour prendre n'importe quel forme de rectangle (rotation)
 def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
+    point = point_le_plus_proche_rectangle(personne, rectangle)
+    
+    
+    distance_mur = np.linalg.norm(point - personne["position"]) - personne["rayon"]
+
+    return 15. * np.exp(- distance_mur / b0) * normalize(personne["position"] - point)
+
+# antienne méthode de calcule
+def _force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 
     x = rectangle["x"]
     y = rectangle["y"]
     h = rectangle["hauteur"]
     l = rectangle["longueur"]
-    rayon = personne["rayon"] 
 
+    rayon   = personne["rayon"] 
     coord_x = personne["position"][0] + rayon
     coord_y = personne["position"][1] + rayon
 
@@ -290,15 +306,6 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
     coord_d = np.array([x , y + h])
     resultat = 0
     
-    # mur_bc = distance_mur_vect(coord_b, coord_c, personne)
-    
-    # resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
-
-    # mur_ab = distance_mur_vect(coord_a, coord_b, personne)
-    
-    # resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
-
-    # print(f"y + h= {y + h} y={y} coord={coord_y}")
 
     if coord_y > y and coord_y < y + h + 2 * rayon and coord_x < x:
         
@@ -320,14 +327,11 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 
             resultat += ad
 
-
-
     if coord_x - 2 * rayon > x and coord_x - 2 * rayon < x + l and coord_y > y:
 
         mur_ab = distance_mur_vect(coord_a, coord_b, personne)
         
         resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1] * -1
-
 
     if coord_x - 2 * rayon > x and coord_x < x + l and coord_y > y:
 
@@ -355,18 +359,18 @@ def force_intercation_cercle(personne, cercle, b0=config["b0"]):
 
 def force_interaction_obstacle(personne, obstacles):
 
+    acc = np.array([0., 0.])
     for obstacle in obstacles:
 
         if obstacle["type"] == "rectangle":
 
-            return force_intercation_rectangle(personne, obstacle)
+            acc += force_intercation_rectangle(personne, obstacle)
             
         elif obstacle["type"] == "cercle":
 
-            return force_intercation_cercle(personne, obstacle)
+            acc += force_intercation_cercle(personne, obstacle)
 
-
-    return 0
+    return acc
 
 
 """

@@ -34,6 +34,14 @@ def initialiser_tab_personne():
 
             })
 
+    """ tab.append({
+        "position": np.array([100, 200]),
+        "masse": 10,
+        "vitesse_desiree": 1.34, 
+        "vitesse": np.array([0, 0]),
+        "to": .2,
+        "rayon": 10
+    }) """
 
     return tab
 
