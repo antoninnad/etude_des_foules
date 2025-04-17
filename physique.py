@@ -268,11 +268,46 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 
     return resultat
 
+
+def force_intercation_cercle(personne, cercle, b0=config["b0"]):
+    
+    resultat = np.array([0, 0])
+    
+    o = np.array([cercle["x"], cercle["y"]])
+    i = personne["position"]
+    
+    distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
+    
+    resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
+    	
+    return resultat
+
+
+def force_intercation_cercle(personne, cercle, b0=config["b0"]):
+    
+    resultat = np.array([0, 0])
+    
+    o = np.array([cercle["x"], cercle["y"]])
+    i = personne["position"]
+    
+    distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
+    
+    resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
+    	
+    return resultat
+
 def force_interaction_obstacle(personne, obstacles):
     accumulateur = 0
-    for obst in obstacles:
-        if obst["type"] == "rectangle":
-            accumulateur += force_intercation_rectangle(personne, obst)
+    for obstacle in obstacles:
+        if obstacle["type"] == "rectangle":
+
+            accumulateur += force_intercation_rectangle(personne, obstacle)
+            
+        elif obstacle["type"] == "cercle":
+
+            accumulateur += force_intercation_cercle(personne, obstacle)
+
+
     return accumulateur
 
 
