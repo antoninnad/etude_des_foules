@@ -56,9 +56,10 @@ class configuration:
                 le canevas sur lequel afficher le cadre
         """
         
+        #rectangle creu
         canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, outline="maroon", width=self.outlineTaille, fill="white")
         
-        #sortie
+        #sortie "porte"
         canvas.create_rectangle(
             self.sortie["x"], 
             self.sortie["y"], 

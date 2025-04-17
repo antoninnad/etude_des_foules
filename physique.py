@@ -42,6 +42,8 @@ def calcul_ei0(personne):
     
     #position de la porte
     pt_souhaite = np.array([624, 335])
+    # pour tester les murs horizontaux
+    # pt_souhaite = np.array([624, 935]) 
 
     #direction 
     vecteur_ei0 =  pt_souhaite - personne["position"]
@@ -156,7 +158,7 @@ def distance_mur_vect(coord_a, coord_b, personne):
     AP = coord_personne - coord_a
     AB = coord_b - coord_a
 
-    alpha = angle_entre_vecteur(AP,AB)
+    alpha = angle_entre_vecteur(AP, AB)
 
 
     PE = (np.linalg.norm(AP) * np.sin(alpha) - personne["rayon"]) 
@@ -171,6 +173,74 @@ def distance_mur_vect(coord_a, coord_b, personne):
 
     return resultat, vecteur_normal, AE
 
+def _distance_mur_vect(mur_pos1 : np.array, mur_pos2 : np.array, personne : dict):
+    coord_personne = personne["position"]
+    
+    mur_len = mur_pos2 - mur_pos1
+    
+    vec_pers_mur = coord_personne - mur_pos1
+    
+    mur_longueur = np.linalg.norm(mur_len)
+    if (mur_longueur == 0):
+        return (mur_pos1)
+    
+    mur_len_normaliser = mur_len / mur_longueur
+    
+    k = np.dot(vec_pers_mur, mur_len_normaliser)
+    print(k)
+    
+    if (k <= 0):
+        return (mur_pos1)
+    if (k >= np.linalg.norm(mur_len)):
+        return mur_pos1 + mur_len
+
+    return mur_pos1 + k * mur_len_normaliser
+    
+    
+    
+# v2_normalize(v2_diff(closest, self->pos));    
+
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0: 
+       return v
+    return v / norm
+
+def _force_intercation_social_mur(personne, indice, b0 = config["b0"]):
+
+    # une liste de pair de possition (x,y)
+    murs = [
+        [np.array([50, 50]),   np.array([600, 50 ])], # haut
+        [np.array([50, 50]),   np.array([50,  600])], # gauche
+        [np.array([600, 600]), np.array([50,  600])], # bas
+        [np.array([600, 50]),  np.array([600, 380])], # droite haut
+        [np.array([600, 320]), np.array([600, 600])], # droite bas
+    ]
+    murs_rayon = 10
+    
+    force = 0
+    
+    # mur_ab = _distance_mur_vect(coord_a, coord_b, personne)
+    # normaliz
+    
+    for mur in murs:
+        n_proche = 0
+        n_i_self = normalize(n_proche - personne["position"])
+        distance_min_mur_personne = murs_rayon + personne["rayon"] - np.linalg.norm(n_proche - personne["position"])
+        resultat += np.exp(distance_min_mur_personne / b0) * n_i_self
+
+
+
+    mur_ad = _distance_mur_vect(coord_a, coord_d, personne)
+
+    
+    resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
+
+    mur_dc = _distance_mur_vect(coord_d, coord_c, personne)
+
+    resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
+
+    return resultat
 
 def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
 
