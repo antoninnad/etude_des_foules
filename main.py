@@ -7,7 +7,7 @@ import math
 import time
 
 
-from physique import euler
+from physique import *
 from affichage import *
 
 
