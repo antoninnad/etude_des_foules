@@ -25,6 +25,7 @@ def initialiser_tab_personne():
         for x in range(15):
 
             tab.append({
+                "id": y*10+x,
                 "position": np.array([100 + 30 * y, 100 + 30 * x]),
                 "masse": 10,
                 "vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
@@ -38,7 +39,15 @@ def initialiser_tab_personne():
     return tab
 
 tab_personne = initialiser_tab_personne()
+followed = []
+fichier_coords = open('fichier_coords.txt', 'w')
+fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+n = len(tab_personne)
 
+while len(followed) != 3:
+	id_individu = random.randint(0, n-1)
+	if id_individu not in followed:
+		followed.append(id_individu)
 
 class app:
 
@@ -224,6 +233,18 @@ class app:
                 if personne["position"][0] > 610:
                     tab_personne.pop(indice)
 
+        personnes_id = [i['id'] for i in tab_personne]
+        
+		for i in followed:
+			boolean = 0
+			for p in tab_personne:
+				if p['id']==i:
+					boolean=1
+					fichier_coords.write(f"{p['position'][0]};{550-p['position'][1]};")
+			if not boolean:
+				fichier_coords.write(f"nan;nan;")
+		fichier_coords.write("\n")
+
         self.particule["text"] = f"Personnes {len(tab_personne)}/{self.nombre}"
 
         if len(tab_personne) != 0:
@@ -237,7 +258,8 @@ class app:
         else:
             self.temps["text"] = f"Temps {self.debut:.2f} s"
             messagebox.showinfo("Resultat", f"Fait en {self.debut:.2f} secondes")
-
+            fichier_coords.close()
+			plot_graphs()
             return
         
         
