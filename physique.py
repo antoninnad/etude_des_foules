@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import csv
+import matplotlib.pyplot as plt
 
 
 config = {
@@ -318,3 +320,46 @@ def euler(tab_personne, personne,indice,obstacles, step=.02):
         vitesse_x,
         vitesse_y
     ])
+
+
+
+
+
+def plot_graphs():
+	
+	f = open('fichier_coords.txt', 'r')
+	
+	coords = csv.DictReader(f, delimiter=';')
+	
+	x1, x2, x3 = [], [], []
+	y1, y2, y3 = [], [], []
+	
+	for row in coords:
+		x1.append(float(row['x1'])*0.01)
+		x2.append(float(row['x2'])*0.01)
+		x3.append(float(row['x3'])*0.01)
+		y1.append(float(row['y1'])*0.01)
+		y2.append(float(row['y2'])*0.01)
+		y3.append(float(row['y3'])*0.01)
+		
+	x1, x2, x3 = np.array(x1), np.array(x2), np.array(x3)
+	y1, y2, y3 = np.array(y1), np.array(y2), np.array(y3)
+
+	plt.title("Trajectoire d'individus selon le modèle de Helbing")
+	plt.xlabel('x (m)')
+	plt.ylabel('y (m)')
+	plt.plot(x1, y1, color='r')
+	plt.plot(x2, y2, color='b')
+	plt.plot(x3, y3, color='g')
+	
+	plt.xlim(0, 6)
+	plt.ylim(0, 6)
+	
+	plt.show()
+
+
+
+
+
+
+
