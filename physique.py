@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 config = {
-	"b0": 4
+	"b0": 8
 }
 
 """Normalise un vecteur"""
@@ -344,7 +344,7 @@ def _force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 	return resultat
 
 
-def force_intercation_cercle(personne, cercle, b0=config["b0"]):
+def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 	
 	resultat = np.array([0, 0])
 	
@@ -358,7 +358,7 @@ def force_intercation_cercle(personne, cercle, b0=config["b0"]):
 	return resultat
 
 
-def force_intercation_cercle(personne, cercle, b0=config["b0"]):
+def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 	
 	resultat = np.array([0, 0])
 	
@@ -380,7 +380,7 @@ def force_interaction_obstacle(personne, obstacles):
 			
 		elif obstacle["type"] == "cercle":
 
-			accumulateur += force_intercation_cercle(personne, obstacle)
+			accumulateur += force_interaction_cercle(personne, obstacle)
 
 
 	return accumulateur
@@ -457,43 +457,3 @@ def plot_graphs():
 	plt.ylim(0, 6)
 	
 	plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
