@@ -52,10 +52,11 @@ def initialiser_tab_personne_pour_une_class():
 	tab = []
 
 	tab.append({
+				"id": 0,
 				"position": np.array([150, 90]),
 				"destination": np.array([150, 90]),
 				"masse": 10,
-				"vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
+				"vitesse_desiree": 2 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
 				"vitesse": np.array([0, 0]),
 				"to": .2,
 				"rayon": 12
@@ -65,13 +66,14 @@ def initialiser_tab_personne_pour_une_class():
 		for x in range(6):
 			x_colunm_seperator = 60 if (x>2) else 0
 			tab.append({
+				"id": y*10+x+1,
 				"position": np.array([120 + (70 * x) + x_colunm_seperator, 260 + (71* y)]),
 				"destination": np.array([120 + (70 * x) + x_colunm_seperator, 260 + (71* y)]),
 				"masse": 10,
-				"vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
+				"vitesse_desiree": 2 + random.randint(0, 25) * .1, 
 				"vitesse": np.array([0, 0]),
 				"to": .2,
-				"rayon": 10 +  random.randint(-2, 2)
+				"rayon": 10	+  random.randint(-2, 2)
 			})
 	return tab
 
@@ -165,7 +167,19 @@ class app:
 		"""
 			start la simulation dans une salle de classe
 		"""
-		global tab_personne
+		global tab_personne, followed
+		tab_personne = initialiser_tab_personne()
+		followed = []
+		
+		global fichier_coords
+		fichier_coords = open('fichier_coords.txt', 'w')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		n = len(tab_personne)
+
+		while len(followed) != 3:
+			id_individu = random.randint(0, n-1)
+			if id_individu not in followed:
+				followed.append(id_individu)
 		tab_personne = initialiser_tab_personne_pour_une_class()
 		self.portes = [(624, 335)]
 		self.start()
@@ -176,7 +190,19 @@ class app:
 		"""
 			start la simulation dans une salle avec un obstacle
 		"""
-		global tab_personne
+		global tab_personne, followed
+		tab_personne = initialiser_tab_personne()
+		followed = []
+		
+		global fichier_coords
+		fichier_coords = open('fichier_coords.txt', 'w')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		n = len(tab_personne)
+
+		while len(followed) != 3:
+			id_individu = random.randint(0, n-1)
+			if id_individu not in followed:
+				followed.append(id_individu)
 		tab_personne = initialiser_tab_personne()
 		self.portes = [(624, 335)]
 		self.start()
@@ -280,7 +306,7 @@ class app:
 
 		self.particule["text"] = f"Personnes {len(tab_personne)}/{self.nombre}"
 
-		if len(tab_personne) != 0:
+		if len(tab_personne) != 0 and self.debut<150:
 	
 			self.afficher()
 			self.temps["text"] = f"Temps {self.debut:.2f} s"
@@ -301,3 +327,4 @@ class app:
 
 if __name__ == "__main__":
 	app()
+	# ~ plot_graphs()
