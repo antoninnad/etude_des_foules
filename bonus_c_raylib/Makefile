@@ -5,8 +5,8 @@ FLAGS=
 
 CC = clang
 LD = clang
-GENERAL_CFLAGS = -I~/C/my_lib -I./include_h -Wall $(FLAGS) -Wno-error=sign-compare -Wno-sign-compare -Wno-unused-function -Wno-unused-variable
-GENERAL_LDFLAGS = -I~/C/my_lib -I./include_h  -lpthread -lm -l:libraylib.a  -L./lib
+GENERAL_CFLAGS = -I./include_h -Wall $(FLAGS) -Wno-error=sign-compare -Wno-sign-compare -Wno-unused-function -Wno-unused-variable
+GENERAL_LDFLAGS = -I./include_h  -lpthread -lm -l:libraylib.a  -L./lib
 
 
 

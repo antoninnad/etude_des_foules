@@ -5,6 +5,9 @@ make so_release
 // launch :
 make so_release_exe
 
+ou utilisé la version déjà complié :
+./so_release.out
+
 l'interface se découpe en 4 partie :
  
  I-  en haut les sliders pour changer les variables (listé de gauche à droite) :
