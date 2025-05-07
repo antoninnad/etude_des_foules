@@ -202,7 +202,7 @@ def normalize(v):
     return v / norm
 
 
-def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
+def force_intercation_social_mur(personne, indice, portes, b0 = config["b0"]):
 
     coord_a = np.array([50, 50])
     coord_b = np.array([600,50])
@@ -211,11 +211,14 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
     
     resultat = 0
     
+    inAdoor = False
+    for porte in portes:
+        if (personne["position"][1] > porte[1] and personne["position"][1] < (porte[1] + 40)) and personne["position"][0] < porte[0] + 20:
+           inAdoor = True 
     
-    if not (personne["position"][1] > 310 and personne["position"][1] < 340) and personne["position"][0] < 600 - personne["rayon"]:
-        mur_bc = distance_mur_vect(coord_b, coord_c, personne)
-    
-        resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
+    mur_bc = distance_mur_vect(coord_b, coord_c, personne)
+
+    resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1] if not inAdoor else resultat
 
     mur_ab = distance_mur_vect(coord_a, coord_b, personne)
     
@@ -387,7 +390,7 @@ def force_interaction_obstacle(personne, obstacles):
 resoud l'equation et actualise la position
 
 """
-def euler(tab_personne, personne,indice,obstacles, step=.02):
+def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
     """
         pb physique 
     """
@@ -396,7 +399,7 @@ def euler(tab_personne, personne,indice,obstacles, step=.02):
     f_m = force_motrice(personne)
 
     #force des murs de la simulation
-    f_m += force_intercation_social_mur(personne , indice)
+    f_m += force_intercation_social_mur(personne , indice, portes)
 
     #force interaction personnes
     f_m += force_intercation_social(tab_personne, personne, indice)

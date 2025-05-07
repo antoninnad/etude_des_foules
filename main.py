@@ -144,7 +144,7 @@ class app:
         """
         global tab_personne
         tab_personne = initialiser_tab_personne()
-        self.portes = [(624, 335)]
+        self.portes = [[600, 300, 50]]
         self.start()
         self.model()
 
@@ -154,7 +154,7 @@ class app:
         """
         global tab_personne
         tab_personne = initialiser_tab_personne_pour_une_class()
-        self.portes = [(624, 335)]
+        self.portes = [[600, 100, 40], [600, 500, 60]]
         self.start()
         self.arene.ajout_class()
         self.model()
@@ -165,7 +165,7 @@ class app:
         """
         global tab_personne
         tab_personne = initialiser_tab_personne()
-        self.portes = [(624, 335)]
+        self.portes = [[600, 300, 50]]
         self.start()
         self.arene.ajout_obstacles()
         self.model()
@@ -173,9 +173,14 @@ class app:
     def trouvePorte(self):
         for personne in tab_personne:
             closest = self.portes[0]
+            closestDist = np.sqrt( (personne["position"][0] + closest[0])**2 + (personne["position"][1] + closest[1])**2 )
             for porte in self.portes:
-                closest = porte
-            personne["destination"] = closest
+                distancePorte = np.sqrt( (personne["position"][0] + porte[0])**2 + (personne["position"][1] + porte[1])**2 )
+                if closestDist < distancePorte:
+                    closest = porte
+                    closestDist = distancePorte
+            print(personne["position"])  
+            personne["destination"] = np.array([closest[0] + 35, closest[1] + 35])
 
 
     def augmenter_vitesse(self, val):
@@ -242,7 +247,7 @@ class app:
                 personne = tab_personne[indice]
                 #application physique
 
-                euler(tab_personne, personne, indice, self.arene.obstacles)
+                euler(tab_personne, personne, indice, self.arene.obstacles, self.portes)
 
                 if personne["position"][0] > 610:
                     tab_personne.pop(indice)

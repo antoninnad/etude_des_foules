@@ -20,14 +20,16 @@ class configuration:
         self.outlineTaille = 20
 
         self.obstacles = []
-    
+
+
     def placeporte(self, portes):
+        self.sorties = []
         for porte in portes:
-            self.sortie = {
-                "x": porte[0] - 34,
-                "y": porte[1] - 35,
-                "hauteur": 50,
-            }
+            self.sorties.append({
+                "x": porte[0] - self.outlineTaille/2,
+                "y": porte[1],
+                "hauteur": porte[2],
+            })
 
     def ajout_obstacles(self):
         self.obstacles = [
@@ -96,6 +98,16 @@ class configuration:
                 r = obstacle["rayon"]
                 canvas.create_oval(obstacle["x"]-r, obstacle["y"]-r, obstacle["x"]+r, obstacle["y"]+r, width=5)
 
+    def afficherPorte(self,canvas):
+        for sortie in self.sorties:
+            canvas.create_rectangle(
+                sortie["x"], 
+                sortie["y"], 
+                sortie["x"] +  self.outlineTaille,
+                sortie["y"] + sortie["hauteur"], 
+                width=0, 
+                fill="white"
+            )
 
     def afficher(self, canvas):
         """
@@ -109,13 +121,6 @@ class configuration:
         canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, outline="maroon", width=self.outlineTaille, fill="white")
         
         #sortie "porte"
-        canvas.create_rectangle(
-            self.sortie["x"], 
-            self.sortie["y"], 
-            self.sortie["x"] +  self.outlineTaille,
-            self.sortie["y"] + self.sortie["hauteur"], 
-            width=0, 
-            fill="white"
-        )
+        self.afficherPorte(canvas)
 
         self.dessiner_obstacles(canvas)
