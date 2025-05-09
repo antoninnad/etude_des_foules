@@ -1,6 +1,7 @@
 # ignore pycache
 __pycache__/
 _minted-rendu/
+coordonnee/*
 rendu.dvi
 rendu.aux
 rendu.out
