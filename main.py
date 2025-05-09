@@ -127,7 +127,15 @@ class app:
 		self.button2.destroy()
 		self.button3.destroy()
 
+		global fichier_coords,followed
+		fileName = 'coords_' + self.type + '_' + time.asctime(time.localtime(time.time())) + '.txt'
+		fichier_coords = open('coordonnee/'+fileName, 'w')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
 		self.nombre = len(tab_personne)
+
+		followed = random.choices(list(range(self.nombre)),k=6)
+		print(followed)
+
 		self.temps.pack(side="left", padx=10, pady=5)
 		self.particule.pack(side="left", padx=10, pady=25)
 		self.stopBtn.place(x= 10,y= 10)
@@ -145,20 +153,11 @@ class app:
 		"""
 			start la simulation dans une salle vide
 		"""
-		global tab_personne, followed
-		tab_personne = initialiser_tab_personne()
-		followed = []
-		
-		global fichier_coords
-		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
-		n = len(tab_personne)
+		self.type = 'basique'
 
-		while len(followed) != 3:
-			id_individu = random.randint(0, n-1)
-			if id_individu not in followed:
-				followed.append(id_individu)
-				
+		global tab_personne
+		tab_personne = initialiser_tab_personne()
+
 		self.portes = [[600, 300, 50]]
 		self.start()
 		self.model()
@@ -167,20 +166,11 @@ class app:
 		"""
 			start la simulation dans une salle de classe
 		"""
-		global tab_personne, followed
-		tab_personne = initialiser_tab_personne()
-		followed = []
-		
-		global fichier_coords
-		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
-		n = len(tab_personne)
+		self.type = 'class'
 
-		while len(followed) != 3:
-			id_individu = random.randint(0, n-1)
-			if id_individu not in followed:
-				followed.append(id_individu)
+		global tab_personne
 		tab_personne = initialiser_tab_personne_pour_une_class()
+
 		self.portes = [[600, 100, 40], [600, 500, 60]]
 		self.start()
 		self.arene.ajout_class()
@@ -190,20 +180,11 @@ class app:
 		"""
 			start la simulation dans une salle avec un obstacle
 		"""
-		global tab_personne, followed
-		tab_personne = initialiser_tab_personne()
-		followed = []
-		
-		global fichier_coords
-		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
-		n = len(tab_personne)
+		self.type = 'obstacle'
 
-		while len(followed) != 3:
-			id_individu = random.randint(0, n-1)
-			if id_individu not in followed:
-				followed.append(id_individu)
+		global tab_personne
 		tab_personne = initialiser_tab_personne()
+
 		self.portes = [[600, 300, 50]]
 		self.start()
 		self.arene.ajout_obstacles()
@@ -234,11 +215,16 @@ class app:
 		self.vitesse = float(display_val)
 
 	def restart_action(self):
-		global tab_personne
+		global tab_personne, fichier_coords
+
+		fileName = 'coords_' + self.type + '_' + time.asctime(time.localtime(time.time())) + '.txt'
+		fichier_coords = open('coordonnee/'+fileName, 'w')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		
 		wasEmpty = (len(tab_personne) == 0)
 		tab_personne_len_type = self.nombre
 		tab_personne.clear()
-		if (tab_personne_len_type == 45):
+		if (not self.type == 'class'):
 			tab_personne = initialiser_tab_personne()
 		else:
 			tab_personne = initialiser_tab_personne_pour_une_class()
@@ -321,9 +307,10 @@ class app:
 		else:
 			self.temps["text"] = f"Temps {self.debut:.2f} s"
 			messagebox.showinfo("Resultat", f"Fait en {self.debut:.2f} secondes")
-			
+
+			fileName = fichier_coords.name
 			fichier_coords.close()
-			plot_graphs()
+			plot_graphs(fileName)
 
 			return
 		

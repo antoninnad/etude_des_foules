@@ -427,9 +427,9 @@ def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
 
 
 
-def plot_graphs():
+def plot_graphs(fileName):
 
-	f = open('fichier_coords.txt', 'r')
+	f = open(fileName, 'r')
 	coords = csv.DictReader(f, delimiter=';')
 	
 	x1, x2, x3 = [], [], []
