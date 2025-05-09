@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 config = {
-	"b0": 8
+	"b0": 5
 }
 
 """Normalise un vecteur"""
@@ -220,23 +220,22 @@ def force_intercation_social_mur(personne, indice, portes, b0 = config["b0"]):
            inAdoor = True 
     
     mur_bc = distance_mur_vect(coord_b, coord_c, personne)
-
+    
     resultat += (np.exp(- mur_bc[0] / b0) * mur_bc[1]) if not inAdoor else resultat
-
-	mur_ab = distance_mur_vect(coord_a, coord_b, personne)
+    
+    mur_ab = distance_mur_vect(coord_a, coord_b, personne)
 	
-	resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
-
-	mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-
-	
-	resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
-
-	mur_dc = distance_mur_vect(coord_d, coord_c, personne)
-
-	resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
-
-	return resultat
+    resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
+    
+    mur_ad = distance_mur_vect(coord_a, coord_d, personne)
+    
+    resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
+    
+    mur_dc = distance_mur_vect(coord_d, coord_c, personne)
+    
+    resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
+    
+    return resultat
 
 
 def point_le_plus_proche_rectangle(personne : dict, rectangle : dict) -> np.array:
@@ -393,16 +392,15 @@ def force_interaction_obstacle(personne, obstacles):
 resoud l'equation et actualise la position
 
 """
-def euler(tab_personne, personne,indice,obstacles, step=.02):
-    """
-        pb physique 
-    """
-
+def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
+	"""
+	pb physique 
+	"""
 	#cacul de la force motrice
 	f_m = force_motrice(personne)
 
-    #force des murs de la simulation
-    f_m += force_intercation_social_mur(personne , indice)
+	#force des murs de la simulation
+	f_m += force_intercation_social_mur(personne , indice, portes)
 
 	#force interaction personnes
 	f_m += force_intercation_social(tab_personne, personne, indice)
