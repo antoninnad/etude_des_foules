@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 config = {
-	"b0": 5
+	"b0": 4
 }
 
 """Normalise un vecteur"""
@@ -432,18 +432,25 @@ def plot_graphs():
 	f = open('fichier_coords.txt', 'r')
 	coords = csv.DictReader(f, delimiter=';')
 	
-	x1, x2, x3 = [], [], []
-	y1, y2, y3 = [], [], []
+	x1, x2, x3, x4, x5, x6 = [], [], [], [], [], []
+	y1, y2, y3, y4, y5, y6 = [], [], [], [], [], []
 
 	for row in coords:
 		
 		x1.append(float(row['x1'])*0.01)
 		x2.append(float(row['x2'])*0.01)
 		x3.append(float(row['x3'])*0.01)
+		x4.append(float(row['x4'])*0.01)
+		x5.append(float(row['x5'])*0.01)
+		x6.append(float(row['x6'])*0.01)
 		y1.append(float(row['y1'])*0.01)
 		y2.append(float(row['y2'])*0.01)
 		y3.append(float(row['y3'])*0.01)
+		y4.append(float(row['y4'])*0.01)
+		y5.append(float(row['y5'])*0.01)
+		y6.append(float(row['y6'])*0.01)
 
+	f.close()
 	x1, x2, x3 = np.array(x1), np.array(x2), np.array(x3)
 	y1, y2, y3 = np.array(y1), np.array(y2), np.array(y3)
 
@@ -453,6 +460,9 @@ def plot_graphs():
 	plt.plot(x1, y1, color='r')
 	plt.plot(x2, y2, color='b')
 	plt.plot(x3, y3, color='g')
+	plt.plot(x4, y4, color='black')
+	plt.plot(x5, y5, color='pink')
+	plt.plot(x6, y6, color='yellow')
 
 	plt.xlim(0, 6)
 	plt.ylim(0, 6)
