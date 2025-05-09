@@ -25,7 +25,7 @@ def initialiser_tab_personne():
 		for x in range(15):
 
 			tab.append({
-				"id": y*10+x,
+				"id": y*15+x,
 				"position": np.array([100 + 30 * y, 100 + 30 * x]),
 				"destination": np.array([100 + 30 * y, 100 + 30 * x]),
 				"masse": 10,
@@ -36,14 +36,6 @@ def initialiser_tab_personne():
 				
 			})
 
-	""" tab.append({
-		"position": np.array([100, 200]),
-		"masse": 10,
-		"vitesse_desiree": 1.34, 
-		"vitesse": np.array([0, 0]),
-		"to": .2,
-		"rayon": 10
-	}) """
 
 	return tab
 
@@ -66,7 +58,7 @@ def initialiser_tab_personne_pour_une_class():
 		for x in range(6):
 			x_colunm_seperator = 60 if (x>2) else 0
 			tab.append({
-				"id": y*10+x+1,
+				"id": y*6+x+1,
 				"position": np.array([120 + (70 * x) + x_colunm_seperator, 260 + (71* y)]),
 				"destination": np.array([120 + (70 * x) + x_colunm_seperator, 260 + (71* y)]),
 				"masse": 10,
@@ -151,10 +143,10 @@ class app:
 		
 		global fichier_coords
 		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3;x4;y4;x5;y5;x6;y6\n')
 		n = len(tab_personne)
 
-		while len(followed) != 3:
+		while len(followed) != 6:
 			id_individu = random.randint(0, n-1)
 			if id_individu not in followed:
 				followed.append(id_individu)
@@ -173,10 +165,10 @@ class app:
 		
 		global fichier_coords
 		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3;x4;y4;x5;y5;x6;y6\n')
 		n = len(tab_personne)
 
-		while len(followed) != 3:
+		while len(followed) != 6:
 			id_individu = random.randint(0, n-1)
 			if id_individu not in followed:
 				followed.append(id_individu)
@@ -196,10 +188,10 @@ class app:
 		
 		global fichier_coords
 		fichier_coords = open('fichier_coords.txt', 'w')
-		fichier_coords.write('x1;y1;x2;y2;x3;y3\n')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3;x4;y4;x5;y5;x6;y6\n')
 		n = len(tab_personne)
 
-		while len(followed) != 3:
+		while len(followed) != 6:
 			id_individu = random.randint(0, n-1)
 			if id_individu not in followed:
 				followed.append(id_individu)
@@ -242,6 +234,15 @@ class app:
 			tab_personne = initialiser_tab_personne()
 		else:
 			tab_personne = initialiser_tab_personne_pour_une_class()
+		fichier_coords.close()
+		fichier_coords = open('fichier_coords.txt', 'w')
+		fichier_coords.write('x1;y1;x2;y2;x3;y3;x4;y4;x5;y5;x6;y6\n')
+		n = len(tab_personne)
+
+		while len(followed) != 6:
+			id_individu = random.randint(0, n-1)
+			if id_individu not in followed:
+				followed.append(id_individu)
 		self.debut = 0
 		self.trouvePorte()
 		if (wasEmpty):
