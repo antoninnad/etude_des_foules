@@ -109,7 +109,7 @@ class app:
 
         self.button2 = tk.Button(
             self.root,
-            text="Commencer simulation obstacles",
+            text="Commencer simulation cour 1 porte",
             width=27,
             command=self.start_obstacles,
             bg="#e8e8e8",
@@ -118,7 +118,7 @@ class app:
 
         self.button3 = tk.Button(
             self.root,
-            text="Commencer simulation cour",
+            text="Commencer simulation cour 2 portes",
             width=27,
             command=self.start_class,
             bg="#e8e8e8",
@@ -275,20 +275,24 @@ class app:
 
     def start_obstacles(self):
         """
-        start la simulation dans une salle avec un obstacle
+        start la simulation dans une salle de classe
         """
-        self.type = "obstacle"
+        self.type = "class"
 
         global tab_personne
-        tab_personne = initialiser_tab_personne()
+        tab_personne = initialiser_tab_personne_pour_une_class()
 
-        self.portes = [[600, 300, 50]]
-        self.nombre = 45
+        self.portes = [[600, 100, 40]]
+        self.nombre = 31
         self.start()
-        self.arene.ajout_obstacles()
+        self.arene.ajout_class()
         self.model()
 
     def trouvePorte(self):
+        """
+            trouve la porte la plus proche pour une particule
+        """
+
         for personne in tab_personne:
             closest = self.portes[0]
             closestDist = np.sqrt(
@@ -306,18 +310,21 @@ class app:
             personne["destination"] = np.array([closest[0] + 35, closest[1] + 35])
 
     def augmenter_vitesse(self, val):
+        """
+            augmente la vitesse du jeu à partir du slider
+        """
+
         val = float(val)
         debut = 0.2
         fin = 30
         if val <= 50:
-            # Appliquer une échelle de debut à 1
             display_val = debut + (val / 50) * (1 - debut)
         else:
-            # Appliquer une échelle de 1 à fin
             display_val = 1 + ((val - 50) / 50) * (fin - 1)
         self.vitesse = float(display_val)
 
     def restart_action(self):
+
         global tab_personne, fichier_coords
 
         if self.dev:
