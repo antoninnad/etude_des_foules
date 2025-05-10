@@ -1,180 +1,185 @@
 import numpy as np
 import math
+
+import csv
+import matplotlib.pyplot as plt
 import csv
 import matplotlib.pyplot as plt
 
 
 config = {
-    "b0": 4
+	"b0": 4
 }
 
 """Normalise un vecteur"""
 def normalize_vector(vector):
-    """Normalise un vecteur"""
-    norm = np.linalg.norm(vector)  # Calcul de la norme euclidienne
-    
-    if norm == 0:
-        raise ValueError("Impossible de normaliser un vecteur nul.")
-    
-    return vector / norm  # Division de chaque élément par la norme
+	"""Normalise un vecteur"""
+	norm = np.linalg.norm(vector)  # Calcul de la norme euclidienne
+	
+	if norm == 0:
+		raise ValueError("Impossible de normaliser un vecteur nul.")
+	
+	return vector / norm  # Division de chaque élément par la norme
 
 """Retourne un vecteur orthogonal"""
 def orthogonal_vector(vector):
-    return np.array([-vector[1], vector[0]])
+	return np.array([-vector[1], vector[0]])
 
 
 
 """
-    Calcule le vecteur de direction normalisé d'une personne à un point souhaité (porte).
+	Calcule le vecteur de direction normalisé d'une personne à un point souhaité (porte).
 
-    Cette fonction calcule le vecteur unitaire pointant à partir de la position actuelle de la personne
-    à un point fixe souhaité, qui représente l'emplacement de la porte.
+	Cette fonction calcule le vecteur unitaire pointant à partir de la position actuelle de la personne
+	à un point fixe souhaité, qui représente l'emplacement de la porte.
 
-    Paramètres :
-    personne (dict) : dico de personne
+	Paramètres :
+	personne (dict) : dico de personne
 
-    Retours :
-    numpy.ndarray : Un vecteur 2D normalisé (ei0) représentant la direction
-                   de la position de la personne jusqu'au point souhaité (porte).
-                   Le vecteur a une norme de 1.
+	Retours :
+	numpy.ndarray : Un vecteur 2D normalisé (ei0) représentant la direction
+				   de la position de la personne jusqu'au point souhaité (porte).
+				   Le vecteur a une norme de 1.
 
-    AssertionError : Si le vecteur résultant n'est pas un vecteur unitaire (magnitude ≠ 1).
+	AssertionError : Si le vecteur résultant n'est pas un vecteur unitaire (magnitude ≠ 1).
 """
 def calcul_ei0(personne):
-    
-    #position de la porte
-    pt_souhaite = np.array([624, 335])
+	
+	#position desiree
+	pt_souhaite = personne["destination"]
+	#direction 
+	vecteur_ei0 =  pt_souhaite - personne["position"]
+	vecteur_ei0 = [0, 1] if all(vecteur_ei0 == [0, 0]) else vecteur_ei0
+	# normalisation du vecteur
+	norm = np.linalg.norm(vecteur_ei0)
+	vecteur_ei0 = vecteur_ei0 / norm
 
-    #direction 
-    vecteur_ei0 =  pt_souhaite - personne["position"]
+	assert( math.isclose(np.linalg.norm(vecteur_ei0), 1) )
 
-    # normalisation du vecteur
-    norm = np.linalg.norm(vecteur_ei0)
-    vecteur_ei0 = vecteur_ei0 / norm
-
-    assert( math.isclose(np.linalg.norm(vecteur_ei0), 1) )
-
-    return vecteur_ei0
+	return vecteur_ei0
 
 
 """
-    Calcule la force motrice d'une personne.
+	Calcule la force motrice d'une personne.
 
-    Cette fonction calcule la force motrice agissant sur une personne en fonction de la vitesse souhaitée,
-    vitesse du courant et un temps de relaxation.
+	Cette fonction calcule la force motrice agissant sur une personne en fonction de la vitesse souhaitée,
+	vitesse du courant et un temps de relaxation.
 
-    Paramètres :
-    personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
-        - 'vitesse_desiree' (float ou numpy.ndarray) : La vitesse souhaitée de la personne.
-        - 'vitesse' (numpy.ndarray) : La vitesse actuelle de la personne.
-        - 'to' (float) : Le temps de relaxation, représentant la rapidité avec laquelle la personne s'adapte à la vitesse souhaitée.
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'vitesse_desiree' (float ou numpy.ndarray) : La vitesse souhaitée de la personne.
+		- 'vitesse' (numpy.ndarray) : La vitesse actuelle de la personne.
+		- 'to' (float) : Le temps de relaxation, représentant la rapidité avec laquelle la personne s'adapte à la vitesse souhaitée.
 
-    Retours :
-    numpy.ndarray : Le vecteur de force motrice résultant agissant sur la personne.
+	Retours :
+	numpy.ndarray : Le vecteur de force motrice résultant agissant sur la personne.
 """   
 
 def force_motrice(personne):
-    
-    resultat = personne["vitesse_desiree"] * calcul_ei0(personne) - personne["vitesse"]
+	
+	resultat = personne["vitesse_desiree"] * calcul_ei0(personne) - personne["vitesse"]
 
-    resultat = resultat /  personne["to"]
+	resultat = resultat /  personne["tau"]
 
-    return resultat
+	return resultat
 
 
 """
-    Calcule la force d'interaction sociale entre une personne et les autres personnes dans la foule.
+	Calcule la force d'interaction sociale entre une personne et les autres personnes dans la foule.
 
-    Cette fonction calcule la force d'interaction sociale ressentie par une personne
-    en raison de la présence d’autres individus dans un seuil d’interaction spécifié.
+	Cette fonction calcule la force d'interaction sociale ressentie par une personne
+	en raison de la présence d’autres individus dans un seuil d’interaction spécifié.
 
-    Paramètres :
-        tab_personne (list) : Une liste de dictionnaires, chacun représentant une personne dans la foule.
-        personne (dict) : Le dictionnaire représentant la personne pour laquelle la force est calculée.
-        indice (int) : L'index de 'personne' dans la liste 'tab_personne'.
-        b0 (float) : paramètre contrôlant la force de la force d’interaction. La valeur par défaut est config["b0"].
-        seuil_interaction (float) : La distance maximale pour considérer les interactions sociales. La valeur par défaut est 50.
+	Paramètres :
+		tab_personne (list) : Une liste de dictionnaires, chacun représentant une personne dans la foule.
+		personne (dict) : Le dictionnaire représentant la personne pour laquelle la force est calculée.
+		indice (int) : L'index de 'personne' dans la liste 'tab_personne'.
+		b0 (float) : paramètre contrôlant la force de la force d’interaction. La valeur par défaut est config["b0"].
+		seuil_interaction (float) : La distance maximale pour considérer les interactions sociales. La valeur par défaut est 50.
 
-    Retours :
-    numpy.ndarray : le vecteur de force d'interaction sociale résultant agissant sur la personne.
+	Retours :
+	numpy.ndarray : le vecteur de force d'interaction sociale résultant agissant sur la personne.
 """
-def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50):
-    
+def force_interaction_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50):
+	
 
-    resultat = 0
+	resultat = 0
 
-    for indice_personne, personne_autre in enumerate(tab_personne):
-        if indice_personne != indice and np.linalg.norm(personne_autre["position"] - personne["position"]) < seuil_interaction:
+	for indice_personne, personne_autre in enumerate(tab_personne):
+		if indice_personne != indice and np.linalg.norm(personne_autre["position"] - personne["position"]) < seuil_interaction:
 
-            a = personne["position"]
-            b = personne_autre["position"]
+			a = personne["position"]
+			b = personne_autre["position"]
 
-            norme_ab = np.linalg.norm(a - b) - personne_autre["rayon"] - personne["rayon"]
+			norme_ab = np.linalg.norm(a - b) - personne_autre["rayon"] - personne["rayon"]
 
-            if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
-                print(f"norm {norme_ab}")
-                print(f"\n vect {(a - b)}")
+			# if np.exp((- norme_ab / .08)) * (a - b)[0] > 1_000:
+			#	 print(f"norm {norme_ab}")
+			#	 print(f"\n vect {(a - b)}")
 
-            resultat = resultat + np.exp((- norme_ab / b0)) * (a - b)
+			resultat = resultat + np.exp((- norme_ab / b0)) * (a - b)
 
-    return resultat
+	return resultat
 
 """ angle entre deux vecteurs """
 def angle_entre_vecteur(u, v):
-    dot_product = np.dot(u, v)
-    norm_u = np.linalg.norm(u)
-    norm_v = np.linalg.norm(v)
-    cos_theta = dot_product / (norm_u * norm_v)
+	dot_product = np.dot(u, v)
+	norm_u = np.linalg.norm(u)
+	norm_v = np.linalg.norm(v)
+	cos_theta = dot_product / (norm_u * norm_v)
 
-    return np.arccos(np.clip(cos_theta, -1.0, 1.0)) 
+	return np.arccos(np.clip(cos_theta, -1.0, 1.0)) 
 
 
 """
-    Calcule la distance entre une personne et un segment de mur et renvoyez le vecteur normal au mur.
+	Calcule la distance entre une personne et un segment de mur et renvoyez le vecteur normal au mur.
 
-    Cette fonction calcule la distance perpendiculaire d'une personne à un segment de mur
-    défini par deux points, et calcule également le vecteur normal à ce segment de mur.
+	Cette fonction calcule la distance perpendiculaire d'une personne à un segment de mur
+	défini par deux points, et calcule également le vecteur normal à ce segment de mur.
 
-    Paramètres :
-    coord_a (numpy.ndarray) : Les coordonnées du premier point du segment de mur.
-    coord_b (numpy.ndarray) : Les coordonnées du deuxième point du segment de mur.
-    personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
-        - 'position' (numpy.ndarray) : La position actuelle de la personne.
-        - 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	Paramètres :
+	coord_a (numpy.ndarray) : Les coordonnées du premier point du segment de mur.
+	coord_b (numpy.ndarray) : Les coordonnées du deuxième point du segment de mur.
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
 
-    Retours :
-    tuple : Un tuple contenant deux éléments :
-        - resultat (float) : La distance perpendiculaire de la personne au segment de mur,
-          ajusté en soustrayant le rayon de la personne.
-        - vecteur_normal (numpy.ndarray) : Le vecteur normal au segment de mur.
-        - AE (float) : Distance sur l'axe AB pour l'évitement
+	Retours :
+	tuple : Un tuple contenant deux éléments :
+		- resultat (float) : La distance perpendiculaire de la personne au segment de mur,
+		  ajusté en soustrayant le rayon de la personne.
+		- vecteur_normal (numpy.ndarray) : Le vecteur normal au segment de mur.
+		- AE (float) : Distance sur l'axe AB pour l'évitement
 
 """
 
 def distance_mur_vect(coord_a, coord_b, personne):
-    
-    coord_personne = personne["position"]
+	
+	coord_personne = personne["position"]
 
-    AP = coord_personne - coord_a
-    AB = coord_b - coord_a
+	AP = coord_personne - coord_a
+	AB = coord_b - coord_a
 
-    alpha = angle_entre_vecteur(AP,AB)
-
-
-    PE = (np.linalg.norm(AP) * np.sin(alpha) - personne["rayon"]) 
+	alpha = angle_entre_vecteur(AP, AB)
 
 
-    vecteur_normal = orthogonal_vector(AB)
-
-    resultat = PE
+	PE = (np.linalg.norm(AP) * np.sin(alpha) - personne["rayon"]) 
 
 
-    AE = math.sqrt(np.linalg.norm(AP) ** 2 -  np.linalg.norm(PE) ** 2)
+	vecteur_normal = orthogonal_vector(AB)
 
-    return resultat, vecteur_normal, AE
+	resultat = PE
 
 
-def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
+	AE = math.sqrt(np.linalg.norm(AP) ** 2 -  np.linalg.norm(PE) ** 2)
+
+	return resultat, vecteur_normal, AE
+
+
+	
+   
+
+def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
 
     coord_a = np.array([50, 50])
     coord_b = np.array([600,50])
@@ -183,144 +188,297 @@ def force_intercation_social_mur(personne, indice, b0 = config["b0"]):
     
     resultat = 0
     
+    inAdoor = False
+    for porte in portes:
+        if (personne["position"][1] > porte[1] and personne["position"][1] < (porte[1] + 40)) and personne["position"][0] < porte[0] + 20:
+           inAdoor = True 
     
-    if not (personne["position"][1] > 310 and personne["position"][1] < 340) and personne["position"][0] < 600 - personne["rayon"]:
-        mur_bc = distance_mur_vect(coord_b, coord_c, personne)
+    mur_bc = distance_mur_vect(coord_b, coord_c, personne)
     
-        resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
-
+    resultat += (np.exp(- mur_bc[0] / b0) * mur_bc[1]) if not inAdoor else resultat
+    
     mur_ab = distance_mur_vect(coord_a, coord_b, personne)
-    
+	
     resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
-
+    
     mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-
     
     resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
-
+    
     mur_dc = distance_mur_vect(coord_d, coord_c, personne)
-
+    
     resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
-
+    
     return resultat
 
-def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 
-    x = rectangle["x"]
-    y = rectangle["y"]
-    h = rectangle["hauteur"]
-    l = rectangle["longueur"]
-    rayon = personne["rayon"] 
+def point_le_plus_proche_rectangle(personne : dict, rectangle : dict) -> np.array:
+	# vecteur mur (un sommet) -> personne
+	pers_mur = personne["position"] - np.array([rectangle["x"], rectangle["y"]])
+	
+	# le vecteur pour désigner la longeur du mur 
+	# pourra dans le future, ne pas être aligner aux axes x y
+	vecteur_mur1 = np.array([rectangle["longueur"], 0.])
+	
+	# le vecteur pour désigner la largeur du mur 
+	vecteur_mur2 = np.array([0., rectangle["hauteur"]])
+	
+	# vérifie si personne n'est pas dans le mur
+	est_pas_dans_mur = False
+	
+	
+	k1 = np.dot(pers_mur, normalize_vector(vecteur_mur1))
+	if (k1 < 0.):
+		k1 = 0.
+		est_pas_dans_mur = True
+	
+	vecteur_mur1_longeur = np.linalg.norm(vecteur_mur1)
+	if (k1 > vecteur_mur1_longeur):
+		k1 = vecteur_mur1_longeur
+		est_pas_dans_mur = True
+	
+	k2 = np.dot(pers_mur, normalize_vector(vecteur_mur2))
+	if (k2 < 0.):
+		k2 = 0.
+		est_pas_dans_mur = True
+	
+	vecteur_mur2_longeur = np.linalg.norm(vecteur_mur2)
+	if (k2 > vecteur_mur2_longeur):
+		k2 = vecteur_mur2_longeur
+		est_pas_dans_mur = True
+		
+	return (
+		np.array([rectangle["x"], rectangle["y"]])
+	  + k1 * (vecteur_mur1)/ vecteur_mur1_longeur
+	  + k2 * (vecteur_mur2)/ vecteur_mur2_longeur
+	)
+		
+# donne le vecteur de répulsion d'un rectangle sur une personne
+# facilement modifible pour prendre n'importe quel forme de rectangle (rotation)
+def force_interaction_rectangle(personne, rectangle, b0=config["b0"]):
+	point = point_le_plus_proche_rectangle(personne, rectangle)
+	
+	
+	distance_mur = np.linalg.norm(point - personne["position"]) - personne["rayon"]
 
-    coord_x = personne["position"][0] + rayon
-    coord_y = personne["position"][1] + rayon
-
-
-    coord_a = np.array([x, y])
-    coord_b = np.array([x + l,y])
-    coord_c = np.array([x + l,y + h])
-    coord_d = np.array([x , y + h])
-    resultat = 0
-    
-    # mur_bc = distance_mur_vect(coord_b, coord_c, personne)
-    
-    # resultat += np.exp(- mur_bc[0] / b0) * mur_bc[1]
-
-    # mur_ab = distance_mur_vect(coord_a, coord_b, personne)
-    
-    # resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
-
-    # print(f"y + h= {y + h} y={y} coord={coord_y}")
-
-    if coord_y > y and coord_y < y + h + 2 * rayon and coord_x < x:
-        
-        mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-        resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1]
-
-        # ajout force contournement
-        if mur_ad[0] < 20:
-            ad = coord_a - coord_d
-
-            signe = 1
-
-            
-            #pour de faire aller la force vers le haut ou vers le vas
-            if mur_ad[2] > h/2:
-                signe = -1
-
-            ad = normalize_vector(ad) * 10 * signe
-
-            resultat += ad
-
-
-
-    if coord_x - 2 * rayon > x and coord_x - 2 * rayon < x + l and coord_y > y:
-
-        mur_ab = distance_mur_vect(coord_a, coord_b, personne)
-        
-        resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1] * -1
+	return 15. * np.exp(- distance_mur / b0) * normalize_vector(personne["position"] - point)
 
 
-    if coord_x - 2 * rayon > x and coord_x < x + l and coord_y > y:
+def force_interaction_cercle(personne, cercle, b0=config["b0"]):
+	
+	resultat = np.array([0, 0])
+	
+	o = np.array([cercle["x"], cercle["y"]])
+	i = personne["position"]
+	
+	distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
+	
+	resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
+		
+	return resultat
 
-        mur_dc = distance_mur_vect(coord_d, coord_c, personne)
 
-        resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] 
-
-    
-
-    return resultat
+def force_interaction_cercle(personne, cercle, b0=config["b0"]):
+	
+	resultat = np.array([0, 0])
+	
+	o = np.array([cercle["x"], cercle["y"]])
+	i = personne["position"]
+	
+	distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
+	
+	resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
+		
+	return resultat
 
 def force_interaction_obstacle(personne, obstacles):
+	accumulateur = 0
+	for obstacle in obstacles:
+		if obstacle["type"] == "rectangle":
 
-    for obstacle in obstacles:
+			accumulateur += force_interaction_rectangle(personne, obstacle)
+			
+		elif obstacle["type"] == "cercle":
 
-        if obstacle["type"] == "rectangle":
-
-            return force_intercation_rectangle(personne, obstacle)
+			accumulateur += force_interaction_cercle(personne, obstacle)
 
 
-    return 0
+	return accumulateur
+
 
 
 """
-resoud l'equation et actualise la position
+Fonction resultante : calcul la résultante des forces appliquées à un individu
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+Sortie	: f : force resultante
+Note : f correspond bien à la dérivée de la vitesse par application du PFD
+"""
+
+def resultante(tab_personne, personne,indice,obstacles, portes):
+	
+	f = force_motrice(personne)								#calcul de la force motrice principale
+	f += 4*force_interaction_social_mur(personne , indice, portes)/personne["masse"]	#force exercée par les murs de la simulation
+	f += 10*force_interaction_social(tab_personne, personne, indice)/personne["masse"]	#force interaction d'interaction sociale
+	f += 10*force_interaction_obstacle(personne, obstacles)/personne["masse"]		#forces exercée par les obstacles
+	
+	return f
 
 """
-def euler(tab_personne, personne,indice,obstacles, step=.02):
-    """
-        pb physique 
-    """
+Procédure euler : résoud numériquement l'équation différentielle
+		  de la vitesse d'un individu par méthode d'Euler
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
+"""
+def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
 
-    #cacul de la force motrice
-    f_m = force_motrice(personne)
+	vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
+	
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
 
-    #force des murs de la simulation
-    f_m += force_intercation_social_mur(personne , indice)
+	#Incrémentation des composantes vitesse en x et y
+	vm_x =  vn_x + step * force[0]
+	vm_y = vn_y + step * force[1]
 
-    #force interaction personnes
-    f_m += force_intercation_social(tab_personne, personne, indice)
+	# Suppression des vitesses impossibles
+	if vm_x**2 + vm_y**2 > 10:
+		norme = np.linalg.norm(np.array([vm_x, vm_y]))
+		vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
+	
+	#Actualisation de la position
+	personne["position"] = np.array( [
+		personne["position"][0] + vm_x,
+		personne["position"][1] + vm_y 
+	])
 
-    #forces obstacles
-    f_m += force_interaction_obstacle(personne, obstacles)
+	# Mise à jour de la vitesse
+	personne["vitesse"] = np.array([
+		vm_x,
+		vm_y
+	])
 
-    #projection sur Ux et Uy
-    vitesse_x =  personne["vitesse"][0] + step * f_m[0]
-    vitesse_y = personne["vitesse"][1] + step * f_m[1]
 
-    
-    #on actualise la position
+
+
+"""
+Procédure runge_kutta_2 : résoud numériquement l'équation différentielle
+			  de la vitesse d'un individu par méthode de Runge-Kutta à l'ordre 2
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
+"""
+def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02):
+
+
+	vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
+	k1, k2 = np.array([]), np.array([])
+	
+	
+	# k1 = h*f(yn)
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k1 = step*force
+	
+	# k2 = h*f(yn+1/2*k1)
+	personne["vitesse"][0] += 1/2*k1[0]
+	personne["vitesse"][1] += 1/2*k1[1]
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k2 = step*force
+			
+	#Incrémentation des composantes vitesse en x et y
+	# v(n+1) = v(n)+k2
+	vm_x =  vn_x + k2[0]
+	vm_y = vn_y + k2[1]
+
+	# Suppression des vitesses impossibles
+	if vm_x**2 + vm_y**2 > 10:
+		norme = np.linalg.norm(np.array([vm_x, vm_y]))
+		vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
+	
+	#Actualisation de la position
+	personne["position"] = np.array( [
+		personne["position"][0] + vm_x,
+		personne["position"][1] + vm_y 
+	])
+
+	# Mise à jour de la vitesse
+	personne["vitesse"] = np.array([
+		vm_x,
+		vm_y
+	])
+
+
+
+"""
+Procédure runge_kutta_4 : résoud numériquement l'équation différentielle
+			  de la vitesse d'un individu par méthode de Runge-Kutta à l'ordre 4
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
+"""
+def runge_kutta_4(tab_personne, personne,indice,obstacles, portes, step=.02):
+		
+    vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
+    k1, k2, k3, k4 = np.array([]), np.array([]), np.array([]), np.array([])
+
+    # k1 = h*f(vn)
+    force = resultante(tab_personne, personne,indice,obstacles, portes)
+    k1 = step*force
+
+    # k2 = h*f(vn+1/2*k1)
+    personne["vitesse"][0] += 1/2*k1[0]
+    personne["vitesse"][1] += 1/2*k1[1]
+    force = resultante(tab_personne, personne,indice,obstacles, portes)
+    k2 = step*force
+
+    # k3 = h*f(vn+1/2*k2)
+    personne["vitesse"][0] = vn_x + 1/2*k2[0]
+    personne["vitesse"][1] = vn_y + 1/2*k2[1]
+    force = resultante(tab_personne, personne,indice,obstacles, portes)
+    k3 = step*force
+
+    # k4 = h*f(yn+k3)
+    personne["vitesse"][0] = vn_x + k3[0]
+    personne["vitesse"][1] = vn_y + k3[1]
+    force = resultante(tab_personne, personne,indice,obstacles, portes)
+    k4 = step*force
+
+    #Incrémentation des composantes vitesse en x et y
+    # v(n+1) = v(n) + 1/6*(k1+2*k2+2*k3+k4)
+    vm_x = vn_x + 1/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+    vm_y = vn_y + 1/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+
+    # Suppression des vitesses impossibles
+    if vm_x**2 + vm_y**2 > 10:
+        norme = np.linalg.norm(np.array([vm_x, vm_y]))
+        vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
+
+
+    #Actualisation de la position
     personne["position"] = np.array( [
-        personne["position"][0] + vitesse_x,
-        personne["position"][1] + vitesse_y 
+        personne["position"][0] + vm_x,
+        personne["position"][1] + vm_y 
     ])
 
-    # v(t_n+&)
-    personne["vitesse"] = np.array([
+    personne["vitesse"]=np.array([
         vitesse_x,
         vitesse_y
     ])
-
 
 
 

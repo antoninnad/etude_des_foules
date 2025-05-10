@@ -7,7 +7,6 @@ def dessiner_cercle(canvas, x, y, rayon, couleur):
     canvas.create_oval(x - rayon, y - rayon, x + rayon, y + rayon, outline=couleur, width=2,fill=couleur)
     
 
-
 class configuration:
 
     def __init__(self):
@@ -19,19 +18,67 @@ class configuration:
 
         #taille contours
         self.outlineTaille = 20
-        
-        #porte
-        self.sortie = {
-            "x": self.x1 - self.outlineTaille / 2,
-            "y": self.y1 /2,
-            "hauteur": 50,
-        }
 
-        #defintion des obstacles
+        self.obstacles = []
+
+
+    def placeporte(self, portes):
+        self.sorties = []
+        for porte in portes:
+            self.sorties.append({
+                "x": porte[0] - self.outlineTaille/2,
+                "y": porte[1],
+                "hauteur": porte[2],
+            })
+
+    def ajout_obstacles(self):
         self.obstacles = [
             {"x": 400, "y": 250, "longueur": 50, "hauteur": 90,"type": "rectangle", "couleur": "purple"},
+            {"x": 480, "y": (self.y1+50)/2, "rayon": 30,"type": "cercle", "couleur": 'black'}
         ]
-    
+
+    def ajout_class(self):
+        self.obstacles = [
+            {"x": 100, "y": 110, "longueur": 100, "hauteur": 35,"type": "rectangle", "couleur": "purple"},
+            {"x": 180, "y": 60, "longueur": 300, "hauteur": 10,"type": "rectangle", "couleur": "black"},
+
+            {"x": 90 , "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 220, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 290, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 360, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 430, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+
+            {"x": 90 , "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 160, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 230, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 360, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 430, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            {"x": 500, "y": 500, "longueur": 60, "hauteur": 25,"type": "rectangle", "couleur": "brown"},
+            
+        ]
+
     def dessiner_obstacles(self, canvas):
         """
         Dessine une liste d'obstacles sur un Canvas Tkinter.
@@ -46,7 +93,21 @@ class configuration:
             if obstacle["type"] == "rectangle":
                 longueur, hauteur = obstacle["longueur"], obstacle["hauteur"]
                 canvas.create_rectangle(x, y, x + longueur, y + hauteur, fill=couleur)
+                
+            elif obstacle["type"] == "cercle":
+                r = obstacle["rayon"]
+                canvas.create_oval(obstacle["x"]-r, obstacle["y"]-r, obstacle["x"]+r, obstacle["y"]+r, width=5)
 
+    def afficherPorte(self,canvas):
+        for sortie in self.sorties:
+            canvas.create_rectangle(
+                sortie["x"], 
+                sortie["y"], 
+                sortie["x"] +  self.outlineTaille,
+                sortie["y"] + sortie["hauteur"], 
+                width=0, 
+                fill="white"
+            )
 
     def afficher(self, canvas):
         """
@@ -56,16 +117,10 @@ class configuration:
                 le canevas sur lequel afficher le cadre
         """
         
+        #rectangle creu
         canvas.create_rectangle(self.x0, self.y0, self.x1, self.y1, outline="maroon", width=self.outlineTaille, fill="white")
         
-        #sortie
-        canvas.create_rectangle(
-            self.sortie["x"], 
-            self.sortie["y"], 
-            self.sortie["x"] +  self.outlineTaille,
-            self.sortie["y"] + self.sortie["hauteur"], 
-            width=0, 
-            fill="white"
-        )
+        #sortie "porte"
+        self.afficherPorte(canvas)
 
         self.dessiner_obstacles(canvas)
