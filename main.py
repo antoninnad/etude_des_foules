@@ -121,14 +121,14 @@ class app:
 		# Bouton/slider de configuration de la simulation
 		self.restart = tk.Button(self.root, text="Restart", command=self.restart_action)
 		self.stopBtn = tk.Button(self.root, text="Stop", command=self.stop_action)
-		self.slider = tk.Scale(self.root, from_=0, to=100, orient="horizontal", length=200, command=self.augmenter_vitesse)
+		self.slider = tk.Scale(self.root, from_=0, to=100, orient="horizontal", length=200, command=self.augmenter_vitesse, bg='#e8e8e8')
 		self.menuBtn = tk.Button(self.root, text=">> Menu <<", command=self.restart_app)
 
 		# Initialisation de valeurs
 		self.vitesse = 1
 		self.stop = False
 		self.nombre = 1
-		self.slider.set(53)
+		self.slider.set(50)
 		self.porte = []
 
 		# mainloop
