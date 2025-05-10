@@ -270,7 +270,10 @@ k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
     \vec{v}_{n+1} = \vec{v}_n + k_2
     \]
 \end{itemize}
-
+(voir code)
+\begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
+def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02)
+\end{minted}
 \subsubsection{Resultats de rungge kutta 2 et 4}
 
 \includegraphics[width=\textwidth]{runge.png}
@@ -288,6 +291,8 @@ Au final, on observe un léger écart, dû à la plus grande précision de la m�
 	\item \textbf{main.py} s'occupe de dessiner la fênetre de gérer plusieurs actions il initialise le tableau de personne (tableau de particule)
 	
 	\item \textbf{physique.py} contient uniquement des fonction pour la gestion physique
+	
+	\item \textbf{affichage.py} contient les situations et centralise la gestion des dessin dans le canvas
 \end{itemize}
 
 \subsection{Modélisation physique}
@@ -325,13 +330,28 @@ Pour calculer $d_{ij}$ onprend la norme de la position de la personne avec la no
 
 
 \subsubsection{Force répulsion mur}
+
+\begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
+def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
+\end{minted}
+
 La force de repulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agis sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois ci on utilise pythagore.
 
 \
 La condition sert à ne pas agir si on a une porte.
 \
-La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). A PLUS DETAILLER +-*7g4rg
+La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). Pour mieux comprendre voici un exemple:
 
+\includegraphics[width=\textwidth]{explication.png}
+
+On a déjà la longueur \( AB \) et on cherche \( AC \), on obtient facilement l'angle \( \widehat{ABC} \) que l'on notera \( \alpha \). \\
+On a alors : \( BC = \sin(\alpha) \cdot AB \)
+\\
+\\
+Finalement d'après le théorème de pythagore $\sqrt{AB^2 - CB^2} = AC$, pour le vecteur normal on en déduit les coordonnés de c pour en suite normaliser $\vec{CA}$.
+\\
+\\
+\indent Cette opération est répétée pour les autres murs de manière casi analogue. Une condition supplémentaire est ajoutée afin d’ignorer la zone correspondant à l’emplacement de la porte.
 
 \subsubsection{Force interaction rectangle}
 
@@ -352,14 +372,14 @@ Soit un rectangle défini par ses coordonnées de coin inférieur gauche $(x, y)
 
 \paragraph{Position Relative :}
 
-La position de la personne par rapport au coin inférieur gauche du rectangle est donnée par le vecteur :
+La position de la personne par rapport au coin inférieur gauche du rectangle est:
 \[
 \vec{p}_{\text{relatif}} = (x_{\text{personne}} - x, y_{\text{personne}} - y)
 \]
 
 \paragraph{Projection sur les Bords du Rectangle :}
 
-Pour trouver le point le plus proche sur le rectangle, on projette $\vec{p}_{\text{relatif}}$ sur les vecteurs $\vec{v}_{\text{longueur}}$ et $\vec{v}_{\text{hauteur}}$. On a donc les projections :
+Pour trouver le point le plus proche sur le rectangle, on projette $\vec{p}_{\text{relatif}}$ sur les vecteurs $\vec{v}_{\text{longueur}}$ et $\vec{v}_{\text{hauteur}}$. On a donc:
 
 \begin{align*}
 k_1 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{longueur}}}{\|\vec{v}_{\text{longueur}}\|^2} \\
@@ -425,9 +445,8 @@ On obtien une moyenne de temps sur 10 échentillons pour la classe avec 2 portes
 
 
 
-\section{Bibliographie}
+\section{Réferences}
 
-Voici la liste:
 
 \vspace{1em}
 
