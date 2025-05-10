@@ -397,14 +397,15 @@ Entrées	 : tab_personne : ensemble de la population étudiée
 	   obstacles	: ensemble des obstacles
     	   portes	: ensemble des sorties disponibles
 Sortie	: f : force resultante
+Note : f correspond bien à la dérivée de la vitesse par application du PFD
 """
 
 def resultante(tab_personne, personne,indice,obstacles, portes):
 	
-	f = force_motrice(personne)						#calcul de la force motrice principale
-	f += force_intercation_social_mur(personne , indice, portes)		#force exercée par les murs de la simulation
-	f += force_intercation_social(tab_personne, personne, indice)		#force interaction d'interaction sociale
-	f += force_interaction_obstacle(personne, obstacles)			#forces exercée par les obstacles
+	f = force_motrice(personne)								#calcul de la force motrice principale
+	f += 4*force_intercation_social_mur(personne , indice, portes)/personne["masse"]	#force exercée par les murs de la simulation
+	f += 10*force_intercation_social(tab_personne, personne, indice)/personne["masse"]	#force interaction d'interaction sociale
+	f += 10*force_interaction_obstacle(personne, obstacles)/personne["masse"]		#forces exercée par les obstacles
 	
 	return f
 
@@ -429,6 +430,11 @@ def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
 	vm_x =  vn_x + step * force[0]
 	vm_y = vn_y + step * force[1]
 
+	# Suppression des vitesses impossibles
+	if vm_x**2 + vm_y**2 > 10:
+		norme = np.linalg.norm(np.array([vm_x, vm_y]))
+		vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
+	
 	#Actualisation de la position
 	personne["position"] = np.array( [
 		personne["position"][0] + vm_x,
@@ -477,6 +483,10 @@ def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02):
 	vm_x =  vn_x + k2[0]
 	vm_y = vn_y + k2[1]
 
+	# Suppression des vitesses impossibles
+	if vm_x**2 + vm_y**2 > 10:
+		norme = np.linalg.norm(np.array([vm_x, vm_y]))
+		vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
 	
 	#Actualisation de la position
 	personne["position"] = np.array( [
@@ -534,6 +544,11 @@ def runge_kutta_4(tab_personne, personne,indice,obstacles, portes, step=.02):
 	# v(n+1) = v(n) + 1/6*(k1+2*k2+2*k3+k4)
 	vm_x = vn_x + 1/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
 	vm_y = vn_y + 1/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+
+	# Suppression des vitesses impossibles
+	if vm_x**2 + vm_y**2 > 10:
+		norme = np.linalg.norm(np.array([vm_x, vm_y]))
+		vm_x, vm_y = 2*vm_x/norme, 2*vm_y/norme
 
 	
 	#Actualisation de la position
