@@ -31,7 +31,7 @@ def initialiser_tab_personne():
 				"masse": 10,
 				"vitesse_desiree": 1.34 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
 				"vitesse": np.array([0, 0]),
-				"to": .2,
+				"tau": .2,
 				"rayon": 10 +  random.randint(-2, 2)
 				
 			})
@@ -50,7 +50,7 @@ def initialiser_tab_personne_pour_une_class():
 				"masse": 10,
 				"vitesse_desiree": 2 + random.randint(-1, 1) * random.randint(0, 25) * .01, 
 				"vitesse": np.array([0, 0]),
-				"to": .2,
+				"tau": .2,
 				"rayon": 12
 	})
 
@@ -64,7 +64,7 @@ def initialiser_tab_personne_pour_une_class():
 				"masse": 10,
 				"vitesse_desiree": 2 + random.randint(0, 25) * .1, 
 				"vitesse": np.array([0, 0]),
-				"to": .2,
+				"tau": .2,
 				"rayon": 10	+  random.randint(-2, 2)
 			})
 	return tab
@@ -91,7 +91,7 @@ class app:
 		self.button = tk.Button(self.root, text="Commencer simulation basique", width=27, command=self.start_basique, bg='#e8e8e8')
 		self.button.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
 
-		self.button2 = tk.Button(self.root, text="Commencer simulation obsatcles", width=27, command=self.start_obstacles, bg='#e8e8e8')
+		self.button2 = tk.Button(self.root, text="Commencer simulation obstacles", width=27, command=self.start_obstacles, bg='#e8e8e8')
 		self.button2.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
 
 		self.button3 = tk.Button(self.root, text="Commencer simulation cour", width=27, command=self.start_class, bg='#e8e8e8')
@@ -155,8 +155,7 @@ class app:
 		self.nombre = len(tab_personne)
 
 		followed = random.choices(list(range(self.nombre)),k=6)
-		print(followed)
-
+		
 		self.temps.pack(side="left", padx=10, pady=5)
 		self.particule.pack(side="left", padx=10, pady=25)
 		self.stopBtn.place(x= 10,y= 10)
