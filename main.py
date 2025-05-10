@@ -78,30 +78,53 @@ class app:
 		self.root = tk.Tk()
 		self.root.title("Experience")
 		self.root.geometry("1400x700")
+		self.root.configure(bg='#e8e8e8')
 		self.canvas = tk.Canvas(self.root, width=600 * 2, height=700, bg="white")
 
-		#bouton lié à l'evt start 
-		self.button = tk.Button(self.root, text="Commencer simulation basique", command=self.start_basique)
-		self.button.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+	# Interface de lancement
 
-		self.button2 = tk.Button(self.root, text="Commencer simulation obsatcles", command=self.start_obstacles)
-		self.button2.place(relx=0.5, rely=0.55, anchor=tk.CENTER)
+		# Texte "Simulation à lancer"
+		self.explication_sim = tk.Label(self.root, text="Simulation à lancer :", font=("Arial", 14), bg='#e8e8e8')
+		self.explication_sim.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
-		self.button3 = tk.Button(self.root, text="Commencer simulation cour", command=self.start_class)
-		self.button3.place(relx=0.5, rely=0.65, anchor=tk.CENTER)
+		#Bouttons de lancement de simulation
+		self.button = tk.Button(self.root, text="Commencer simulation basique", width=27, command=self.start_basique, bg='#e8e8e8')
+		self.button.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
 
-		# information sur l'etat actuel de la simulation
+		self.button2 = tk.Button(self.root, text="Commencer simulation obsatcles", width=27, command=self.start_obstacles, bg='#e8e8e8')
+		self.button2.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
+
+		self.button3 = tk.Button(self.root, text="Commencer simulation cour", width=27, command=self.start_class, bg='#e8e8e8')
+		self.button3.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+		# Texte "Mode de résolution des équations de vitesses"
+		self.explication_mode = tk.Label(self.root, text="Mode de résolution des équations de vitesses :", font=("Arial", 14), bg='#e8e8e8')
+		self.explication_mode.place(relx=0.5, rely=0.65, anchor=tk.CENTER)
+
+		# Variable qui contient le choix du mode de résolution
+		self.mode_resolution = tk.StringVar()
+		self.mode_resolution.set("euler")
+
+		# Choix des modes
+		self.radio1 = tk.Radiobutton(self.root, text="Euler", variable=self.mode_resolution, value="euler", bg='#e8e8e8')
+		self.radio1.place(relx=0.3, rely=0.75, anchor=tk.CENTER)
+		self.radio2 = tk.Radiobutton(self.root, text="Runge-Kutta 2", variable=self.mode_resolution, value="rk2", bg='#e8e8e8')
+		self.radio2.place(relx=0.5, rely=0.75, anchor=tk.CENTER)
+		self.radio3 = tk.Radiobutton(self.root, text="Runge-Kutta 4", variable=self.mode_resolution, value="rk4", bg='#e8e8e8')
+		self.radio3.place(relx=0.7, rely=0.75, anchor=tk.CENTER)
+
+		# Informations sur l'etat actuel de la simulation
 		self.particule = tk.Label(self.root, text=f"Personnes ", bg="white", fg="black", font=("Arial", 14))
 		self.temps = tk.Label(self.root, text="Temps 0.0 s", bg="white", fg="black", font=("Arial", 14))
 
 		
-		# bouton/slider de configuration
+		# Bouton/slider de configuration de la simulation
 		self.restart = tk.Button(self.root, text="Restart", command=self.restart_action)
 		self.stopBtn = tk.Button(self.root, text="Stop", command=self.stop_action)
 		self.slider = tk.Scale(self.root, from_=0, to=100, orient="horizontal", length=200, command=self.augmenter_vitesse)
+		self.menuBtn = tk.Button(self.root, text=">> Menu <<", command=self.restart_app)
 
-
-		# initialisation de valeurs
+		# Initialisation de valeurs
 		self.vitesse = 1
 		self.stop = False
 		self.nombre = 1
@@ -115,9 +138,15 @@ class app:
 		"""
 			Initialisation basique de comencement
 		"""
+		self.explication_sim.destroy()
 		self.button.destroy()
 		self.button2.destroy()
 		self.button3.destroy()
+		
+		self.explication_mode.destroy()		
+		self.radio1.destroy()
+		self.radio2.destroy()
+		self.radio3.destroy()
 
 		global fichier_coords,followed
 		fileName = 'coords_' + self.type + '_' + time.asctime(time.localtime(time.time())) + '.txt'
@@ -150,6 +179,7 @@ class app:
 		global tab_personne
 		tab_personne = initialiser_tab_personne()
 		self.portes = [[600, 300, 50]]
+		self.nombre=45
 		self.start()
 		self.model()
 
@@ -163,6 +193,7 @@ class app:
 		tab_personne = initialiser_tab_personne_pour_une_class()
 
 		self.portes = [[600, 100, 40], [600, 500, 60]]
+		self.nombre=31
 		self.start()
 		self.arene.ajout_class()
 		self.model()
@@ -177,6 +208,7 @@ class app:
 		tab_personne = initialiser_tab_personne()
 
 		self.portes = [[600, 300, 50]]
+		self.nombre=45
 		self.start()
 		self.arene.ajout_obstacles()
 		self.model()
@@ -230,6 +262,10 @@ class app:
 	def stop_action(self):
 		self.stop = not self.stop
 
+	def restart_app(self):
+		self.root.destroy()
+		self.__init__()
+
 	def afficher(self):
 		"""
 			dessine chaque persone
@@ -264,7 +300,14 @@ class app:
 				personne = tab_personne[indice]
 				#application physique
 
-				euler(tab_personne, personne, indice, self.arene.obstacles, self.portes)
+				if self.mode_resolution.get() == "euler":
+					euler(tab_personne, personne, indice, self.arene.obstacles, self.portes)
+
+				elif self.mode_resolution.get() == "rk2":
+					runge_kutta_2(tab_personne, personne, indice, self.arene.obstacles, self.portes)
+					
+				else:	# mode_resolution.get() == "rk4":
+					runge_kutta_4(tab_personne, personne, indice, self.arene.obstacles, self.portes)
 
 				if personne["position"][0] > 610:
 					tab_personne.pop(indice)
