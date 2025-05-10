@@ -292,15 +292,15 @@ class app:
         for personne in tab_personne:
             closest = self.portes[0]
             closestDist = np.sqrt(
-                (personne["position"][0] + closest[0]) ** 2
-                + (personne["position"][1] + closest[1]) ** 2
+                (personne["position"][0] - closest[0]) ** 2
+                + (personne["position"][1] - closest[1]) ** 2
             )
             for porte in self.portes:
                 distancePorte = np.sqrt(
-                    (personne["position"][0] + porte[0]) ** 2
-                    + (personne["position"][1] + porte[1]) ** 2
+                    (personne["position"][0] - porte[0]) ** 2
+                    + (personne["position"][1] - porte[1]) ** 2
                 )
-                if closestDist < distancePorte:
+                if closestDist > distancePorte:
                     closest = porte
                     closestDist = distancePorte
             personne["destination"] = np.array([closest[0] + 35, closest[1] + 35])
