@@ -162,6 +162,7 @@ class app:
 		self.stopBtn.place(x= 10,y= 10)
 		self.restart.place(x= 10,y=50)
 		self.slider.place(x=10,y=80)
+		self.menuBtn.place(x=10, y=150, width=100)
 
 		self.trouvePorte()
 		self.arene = configuration()
