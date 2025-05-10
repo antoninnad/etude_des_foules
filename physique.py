@@ -388,41 +388,164 @@ def force_interaction_obstacle(personne, obstacles):
 	return accumulateur
 
 
-"""
-resoud l'equation et actualise la position
 
+"""
+Fonction resultante : calcul la résultante des forces appliquées à un individu
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+Sortie	: f : force resultante
+"""
+
+def resultante(tab_personne, personne,indice,obstacles, portes):
+	
+	f = force_motrice(personne)						#calcul de la force motrice principale
+	f += force_intercation_social_mur(personne , indice, portes)		#force exercée par les murs de la simulation
+	f += force_intercation_social(tab_personne, personne, indice)		#force interaction d'interaction sociale
+	f += force_interaction_obstacle(personne, obstacles)			#forces exercée par les obstacles
+	
+	return f
+
+"""
+Procédure euler : résoud numériquement l'équation différentielle
+		  de la vitesse d'un individu par méthode d'Euler
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
 """
 def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
-	"""
-	pb physique 
-	"""
-	#cacul de la force motrice
-	f_m = force_motrice(personne)
 
-	#force des murs de la simulation
-	f_m += force_intercation_social_mur(personne , indice, portes)
-
-	#force interaction personnes
-	f_m += force_intercation_social(tab_personne, personne, indice)
-
-	#forces obstacles
-	f_m += force_interaction_obstacle(personne, obstacles)
-
-	#projection sur Ux et Uy
-	vitesse_x =  personne["vitesse"][0] + step * f_m[0]
-	vitesse_y = personne["vitesse"][1] + step * f_m[1]
-
+	vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
 	
-	#on actualise la position
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+
+	#Incrémentation des composantes vitesse en x et y
+	vm_x =  vn_x + step * force[0]
+	vm_y = vn_y + step * force[1]
+
+	#Actualisation de la position
 	personne["position"] = np.array( [
-		personne["position"][0] + vitesse_x,
-		personne["position"][1] + vitesse_y 
+		personne["position"][0] + vm_x,
+		personne["position"][1] + vm_y 
 	])
 
-	# v(t_n+&)
+	# Mise à jour de la vitesse
 	personne["vitesse"] = np.array([
-		vitesse_x,
-		vitesse_y
+		vm_x,
+		vm_y
+	])
+
+
+
+
+"""
+Procédure runge_kutta_2 : résoud numériquement l'équation différentielle
+			  de la vitesse d'un individu par méthode de Runge-Kutta à l'ordre 2
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
+"""
+def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02):
+
+
+	vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
+	k1, k2 = np.array([]), np.array([])
+	
+	
+	# k1 = h*f(yn)
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k1 = step*force
+	
+	# k2 = h*f(yn+1/2*k1)
+	personne["vitesse"][0] += 1/2*k1[0]
+	personne["vitesse"][1] += 1/2*k1[1]
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k2 = step*force
+			
+	#Incrémentation des composantes vitesse en x et y
+	# v(n+1) = v(n)+k2
+	vm_x =  vn_x + k2[0]
+	vm_y = vn_y + k2[1]
+
+	
+	#Actualisation de la position
+	personne["position"] = np.array( [
+		personne["position"][0] + vm_x,
+		personne["position"][1] + vm_y 
+	])
+
+	# Mise à jour de la vitesse
+	personne["vitesse"] = np.array([
+		vm_x,
+		vm_y
+	])
+
+
+
+"""
+Procédure runge_kutta_4 : résoud numériquement l'équation différentielle
+			  de la vitesse d'un individu par méthode de Runge-Kutta à l'ordre 4
+Entrées	 : tab_personne : ensemble de la population étudiée
+	   personne	: système considéré au moment de l'appel
+    	   indice	: indice de personne dans tab_personne
+	   obstacles	: ensemble des obstacles
+    	   portes	: ensemble des sorties disponibles
+	   step		: pas de la résolution (précision par défaut à 0.02)
+Sortie	: la position et la vitesse de l'individu sont mises à jour
+"""
+def runge_kutta_4(tab_personne, personne,indice,obstacles, portes, step=.02):
+		
+	vn_x, vn_y = personne["vitesse"][0], personne["vitesse"][1]
+	k1, k2, k3, k4 = np.array([]), np.array([]), np.array([]), np.array([])
+	
+	# k1 = h*f(vn)
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k1 = step*force
+	
+	# k2 = h*f(vn+1/2*k1)
+	personne["vitesse"][0] += 1/2*k1[0]
+	personne["vitesse"][1] += 1/2*k1[1]
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k2 = step*force
+	
+	# k3 = h*f(vn+1/2*k2)
+	personne["vitesse"][0] = vn_x + 1/2*k2[0]
+	personne["vitesse"][1] = vn_y + 1/2*k2[1]
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k3 = step*force
+	
+	# k4 = h*f(yn+k3)
+	personne["vitesse"][0] = vn_x + k3[0]
+	personne["vitesse"][1] = vn_y + k3[1]
+	force = resultante(tab_personne, personne,indice,obstacles, portes)
+	k4 = step*force
+	
+	#Incrémentation des composantes vitesse en x et y
+	# v(n+1) = v(n) + 1/6*(k1+2*k2+2*k3+k4)
+	vm_x = vn_x + 1/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0])
+	vm_y = vn_y + 1/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1])
+
+	
+	#Actualisation de la position
+	personne["position"] = np.array( [
+		personne["position"][0] + vm_x,
+		personne["position"][1] + vm_y 
+	])
+
+	# Mise à jour de la vitesse
+	personne["vitesse"] = np.array([
+		vm_x,
+		vm_y
 	])
 
 
