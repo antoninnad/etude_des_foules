@@ -11,7 +11,7 @@ config = {
 
 """Normalise un vecteur"""
 def normalize_vector(vector):
-	"""Normalise un vecteur"""
+	
 	norm = np.linalg.norm(vector)  # Calcul de la norme euclidienne
 	
 	if norm == 0:
@@ -32,7 +32,7 @@ def orthogonal_vector(vector):
 	à un point fixe souhaité, qui représente l'emplacement de la porte.
 
 	Paramètres :
-	personne (dict) : dico de personne
+	personne (dict) : dictionnaire d'une personne
 
 	Retours :
 	numpy.ndarray : Un vecteur 2D normalisé (ei0) représentant la direction
@@ -119,7 +119,7 @@ def force_interaction_social(tab_personne, personne, indice, b0=config["b0"], se
 
 	return resultat
 
-""" angle entre deux vecteurs """
+""" Calcule l'angle entre deux vecteurs """
 def angle_entre_vecteur(u, v):
 	dot_product = np.dot(u, v)
 	norm_u = np.linalg.norm(u)
@@ -159,23 +159,32 @@ def distance_mur_vect(coord_a, coord_b, personne):
 	AB = coord_b - coord_a
 
 	alpha = angle_entre_vecteur(AP, AB)
-
-
 	PE = (np.linalg.norm(AP) * np.sin(alpha) - personne["rayon"]) 
-
-
 	vecteur_normal = orthogonal_vector(AB)
 
 	resultat = PE
-
-
 	AE = math.sqrt(np.linalg.norm(AP) ** 2 -  np.linalg.norm(PE) ** 2)
 
 	return resultat, vecteur_normal, AE
 
 
 	
-   
+"""
+	Calcule la force d'interaction sociale qu'a un mur sur une personne.
+
+	Cette fonction considère l'influence des quatres murs de la salle.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	indice	: l'indice de la personne dans le tableau de tous les individus
+ 	portes	: liste contenant l'ensemble des portes de sortie
+
+	Retours :
+	resultat: resultante des forces dues aux murs
+
+"""
 
 def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
 
@@ -192,19 +201,15 @@ def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
            inAdoor = True 
     
     mur_bc = distance_mur_vect(coord_b, coord_c, personne)
-    
     resultat += (np.exp(- mur_bc[0] / b0) * mur_bc[1]) if not inAdoor else resultat
     
     mur_ab = distance_mur_vect(coord_a, coord_b, personne)
-	
     resultat += np.exp(- mur_ab[0] / b0) * mur_ab[1]
     
     mur_ad = distance_mur_vect(coord_a, coord_d, personne)
-    
     resultat += np.exp(- mur_ad[0] / b0) * mur_ad[1] * -1
     
     mur_dc = distance_mur_vect(coord_d, coord_c, personne)
-    
     resultat += np.exp(- mur_dc[0] / b0) * mur_dc[1] * -1
     
     return resultat
@@ -250,9 +255,20 @@ def point_le_plus_proche_rectangle(personne : dict, rectangle : dict) -> np.arra
 	  + k1 * (vecteur_mur1)/ vecteur_mur1_longeur
 	  + k2 * (vecteur_mur2)/ vecteur_mur2_longeur
 	)
-		
-# donne le vecteur de répulsion d'un rectangle sur une personne
-# facilement modifible pour prendre n'importe quel forme de rectangle (rotation)
+
+
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle rectangulaire sur une personne.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	rectangle: dictionnaire représentant l'obstacle rectangulaire
+
+	Retours : force répulsive exercée par le rectangle considéré sur "personne"
+
+"""
 def force_interaction_rectangle(personne, rectangle, b0=config["b0"]):
 	point = point_le_plus_proche_rectangle(personne, rectangle)
 	
@@ -262,6 +278,19 @@ def force_interaction_rectangle(personne, rectangle, b0=config["b0"]):
 	return 15. * np.exp(- distance_mur / b0) * normalize_vector(personne["position"] - point)
 
 
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle circulaire sur une personne.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	cercle: dictionnaire représentant l'obstacle cercle
+
+	Retours : 
+ 	resultat: force répulsive exercée par le rectangle considéré sur "personne"
+
+"""
 def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 	
 	resultat = np.array([0, 0])
@@ -276,19 +305,20 @@ def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 	return resultat
 
 
-def force_interaction_cercle(personne, cercle, b0=config["b0"]):
-	
-	resultat = np.array([0, 0])
-	
-	o = np.array([cercle["x"], cercle["y"]])
-	i = personne["position"]
-	
-	distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
-	
-	resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
-		
-	return resultat
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle quelconque sur une personne
+ 	en choisissant 
 
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	obstacle: liste de tous les obstacles existants
+
+	Retours : 
+ 	accumulateur : résultante des force exercée par le rectangle considéré sur "personne"
+
+"""
 def force_interaction_obstacle(personne, obstacles):
 	accumulateur = 0
 	for obstacle in obstacles:
