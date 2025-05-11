@@ -91,9 +91,6 @@
 \subsection{Situation 2}
 \indent On repart sur les bases de la situation une, mais cette fois dans deux salles de cours. Les deux salles sont exactement identique à la différence que la salle 1 a une porte et que la salle 2 a deux portes. Le nombre total d'individu est de 31. Notre objectif est de voir si la porte en plus est vraiment utile.
 
-\paragraph{Note :}
-Une troisième simulation est disponible et a pour objectif d'observer le temps d'évacuation lorsqu'il y a un obstacle devant la sortie. En effet, nous avons vu en cours que ce temps devrait être plus court. Cette simulation reprend les conditions de la première (nombre d'individus, configuration de la salle...) 
-
 \
 \section{Théorie sous-jacente}
 
@@ -113,7 +110,7 @@ où $m_i$ est la masse de l'individu en kilogrammes (kg) et $\tau_i$ est un temp
 Outre la volonté individuelle de se diriger vers un point précis, les piétons interagissent entre eux via des forces dites sociales, traduisant leur tendance à maintenir une distance interpersonnelle dans un simple objectif de confort. Ces interactions sont modélisées par une force répulsive de la forme :
 
 \begin{equation}
-\label{eq:force_sociale (individu-individu}
+\label{eq:force_sociale}
 \vec{f}_{ij}^{\text{s}} = A_i \exp\left(\frac{r_{ij} - d_{ij}}{B_i}\right) \vec{n}_{ij}
 \end{equation}
 
@@ -129,7 +126,6 @@ où :
 Une seconde force sociale d'expression semblable va servir à représenter l'influence répulsive d'un obstacle sur un individu:
 
 \begin{equation}
-\label{eq:force_sociale (obstacle-individu}
 \vec{f}_{io}^{\text{s}} = C_i \exp\left(\frac{- d_{io}}{B_i}\right) \vec{n}_{io}
 \end{equation}
 
@@ -177,7 +173,7 @@ L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
 	"masse": 10,
 	"vitesse_desiree": 1.34, 
 	"vitesse": np.array([0, 0]), #vitesse initiale
-	"tau": .2,
+	"tau": .5,
 	"rayon": 10 + random.randint(-2, 2),
 	"destination": np.array([100,100])
 } 
@@ -319,6 +315,9 @@ Au final, on observe un léger écart dû à la plus grande précision de la mé
 
 \includegraphics[width=\textwidth]{runge_pos.png}
 
+Cependant, lorsqu'on considère plusieurs personnes et leurs interactions, la différence est plus notable :
+
+\includegraphics[width=\textwidth]{differences_euler_rk.png}
 
 \
 \section{Explication du code}
@@ -367,12 +366,12 @@ Pour calculer $d_{ij}$ on prend la norme de la différence des vecteurs position
 
 
 \subsubsection{Force répulsion mur}
-La force de repulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agis sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois ci on utilise pythagore.
+La force de repulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agis sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois-ci on utilise pythagore.
 
 \
-La condition sert à ne pas agir si on a une porte.
+L'action des murs est évidemment supprimée là où se trouvent les portes.
 \
-La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). A PLUS DETAILLER +-*7g4rg
+La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple contenant la distance avec le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{io}}$). Ces informations permettent alors de calculer la force de répulsion avec la formule classique \eqref{eq:force_sociale}.
 
 \subsubsection{Force interaction cercle}
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
