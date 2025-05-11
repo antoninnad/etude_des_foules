@@ -98,6 +98,7 @@ L’objectif est ici de quantifier l’impact de la présence d’une issue supp
 Dans ce second scénario, on a deux salles identiques, à l’exception du nombre de sorties : la salle 1 dispose d’une seule porte, tandis que la salle 2 en possède deux. Les deux espaces accueillent un total de 31 individus (composés d'un professeur et d'étudiants).
 L’objectif est ici de quantifier l’impact de la présence d’une issue supplémentaire sur l’efficacité de l’évacuation, en comparant les temps d’évacuation des deux configurations.
 \
+\\
 \section{Théorie sous-jacente}
 
 Nous nous somme appuyé sur les travaux du modèle de force sociale, de Helbing et Molnár
@@ -291,7 +292,8 @@ def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02)
 
 Au final, on observe un léger écart, dû à la plus grande précision de la méthode de Runge-Kutta. Mais cette écart sur la vitesse n'a pas un grand impact sur la position à en croire le graphique suivant:
 
-\includegraphics[width=\textwidth]{runge_pos.png}
+
+\includegraphics[width=\textwidth]{differences_euler_rk.png}
 
 
 \
@@ -525,7 +527,6 @@ L'interface graphique est divisée en quatre parties principales :
   \end{itemize}
 \end{enumerate}
 
-
 \subsection{Avantages de ce bonus}
 L'utilisation d'un langage de bas niveau a permis une optimisation bien plus poussée. Cela a notamment permis d'obtenir une précision élevée avec un pas de temps de $10^{-4}$, ainsi qu'un nombre maximum d'objets simulés de 800 (nombre choisi arbitrairement). L'algorithme de simulation de plusieurs personnes a une complexité temporelle de $\mathcal{O}(n^2)$, avec $n$ le nombre de personnes simulées, ce qui le rend rapidement très lent pour des situations impliquant un grand nombre de personne. Cependant, cette complexité n'est pas une fatalité. 
 Le modèle utilise une décroissance exponentielle :
@@ -543,8 +544,8 @@ C'est pourquoi j'ai implémenté une approche plus lourde, mais qui permet de r�
 C'est cette optimisation qui permet d'obtenir des performances correctes avec un grand nombre de personnes simulées.
 
 
-\newpage
 
+\newpage
 
 \section{Réferences}
 
