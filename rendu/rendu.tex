@@ -409,23 +409,33 @@ Pour finir on applique \eqref{eq:force_sociale} ici $r_{ij}$ = $r_i$ - 0 car pas
 
 \textbf{Situation 1}
 
-Bdf trois forces:
+Bilan des forces appliquées :
+Trois types de forces principales agissent sur l’individu :
 \begin{itemize}
-	\item \textbf{forces motrices} \eqref{eq:force_motrice}
-	\item \textbf{forces interactions personnes} \eqref{eq:force_sociale}
-	\item \textbf{forces interactions murs} \eqref{eq:force_sociale}
+\item \textbf{Les forces motrices}, modélisées par l’équation \eqref{eq:force_motrice} ;
+\item \textbf{Les forces d’interaction entre personnes}, données par \eqref{eq:force_sociale} ;
+\item \textbf{Les forces d’interaction avec les murs}, également représentées par \eqref{eq:force_sociale}.
 \end{itemize}
-Mais on peut ajouter aussi, les forces d'interaction avec les obstacles comme il n'y a pas de mur le vecteur sera $\vec{0}$.
-\\
-\\
-\textbf{donc au final on obtient une fonction euler qui généralise les deux cas}
-\\
-\\
-On revient à l'equa dif: \eqref{eq:eq_diff}, en utilisant euler
+
+On peut également intégrer les interactions avec d’autres obstacles. Dans le cas où aucun obstacle n’est présent, le vecteur de force associé sera simplement nul : $\vec{0}$.
+
+\vspace{1em}
+
+Ainsi, on peut généraliser le système via une fonction basée sur la méthode d’Euler (et de Runge-Kutta), capable de traiter l’ensemble des cas évoqués.
+
+\vspace{1em}
+
+C'est ce que font les fonctions de résolutions suivantes.
+
+\begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
+def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02):
+def runge_kutta_4(tab_personne, personne,indice,obstacles, portes, step=.02):
+def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
+\end{minted}
 
 
 \section{Analyse}
-Le temps de notre rendu est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dû à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
+Le temps de notre expérience est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dû à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
 \subsection{Situation 1}
 
 \includegraphics[width=\textwidth]{resultat.png} % moitié de la largeur du texte
