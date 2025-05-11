@@ -148,25 +148,27 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 
 \subsection{Determiner l'équation}
 
-\indent Afin d’établir l’équation, nous avons tout d’abord supposé que le référentiel d’étude est galiléen, pour ensuite appliquer la seconde loi de newton $\sum \vec{F}_{\text{particule}} = m_{\text{particule}} \vec{a}$.
-\\On a:
+\indent On considère un individu i de la population étudiée et on se place dans un référentiel terrestre supposé galiléen. Les forces retenues dans ce cas sont celles citées dans la partie précédente (motrice et sociales). On applique la seconde loi de Newton à l'individu considéré : $\sum \vec{F}_{\text{particule}} = m_{\text{particule}} \vec{a}$.
+\\On a alors :
 \[
-\vec{f}_{\text{direction}} + \vec{f}_{\text{social}} = m_{\text{particule}} \frac{d\vec{v}}{dt}.
+\vec{f}_{\text{motrice}} + \vec{f}_{\text{sociale}} = m_{\text{personne}} \frac{d\vec{v}}{dt}.
 \]
-\\ Au final après quelques simplification on a:
+\\ Au final en injectant les expressions on a:
 
 \begin{equation}
 \label{eq:eq_diff}
-\frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} + \frac{1}{m_{\text{particule}}} \sum_{j \neq i}  \exp\left( \frac{r_{ij} - d_{ij}}{B_i} \right) \vec{n}_{ij} = \frac{d\vec{v}}{dt}
+\frac{d\vec{v}}{dt} = \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} + \frac{1}{m_{\text{personne}}}( \sum_{j \neq i}  A_i \exp\left( \frac{r_{ij} - d_{ij}}{B_i} \right) \vec{n}_{ij} +  \sum_{\Omega} C_i \exp\left( \frac{- d_{io}}{B_i} \right) \vec{n}_{io})
 \end{equation}
+où \Omega représente l'ensemble des obstacles.
 
-\subsection{Resolution d'équation différentiel}
+\subsection{Resolution d'équation différentielle}
 \subsubsection{Contextualisation}
 
-\indent Pour résoudre \eqref{eq:eq_diff}. Nous avons décider d'utiliser méthode d'euler:
+\indent Pour résoudre \eqref{eq:eq_diff}, nous allons utiliser trois méthodes différentes. La première est la méthode d'Euler : 
 \[
-\vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot \vec{F}_n
+\vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot frac{d\vec{v}}{dt}
 \]
+L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
 \\ On introduit une personne modélisée en Python par un dictionnaire (pour mieux comprendre  la fonction qui permet de résoudre cette équation) :
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
@@ -175,7 +177,7 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 	"masse": 10,
 	"vitesse_desiree": 1.34, 
 	"vitesse": np.array([0, 0]), #vitesse initiale
-	"to": .2,
+	"tau": .2,
 	"rayon": 10 + random.randint(-2, 2),
 	"destination": np.array([100,100])
 } 
@@ -186,11 +188,11 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
     
     \item \texttt{"masse"} : La masse de la personne, ici fixée à 10 (arbitrairement).
     
-    \item \texttt{"vitesse\_desiree"} : La vitesse désirée que la personne souhaite atteindre, (ici 1.34 $ms^{-1}$).
+    \item \texttt{"vitesse\_desiree"} : La vitesse désirée que la personne souhaite atteindre, (par défaut 1.34 $ms^{-1}$).
     
     \item \texttt{"vitesse"} : Un tableau NumPy qui représente la vitesse initiale de la personne. La vitesse initiale est définie comme un vecteur nul \([0, 0]\) (immobile au départ)
     
-    \item \texttt{"to"} : Un paramètre fixé à 0.2. Il pourrait représenter un coefficient de friction, de résistance ou tout autre facteur de modification des interactions.
+    \item \texttt{"tau"} : Un paramètre fixé à 0.2. Il représente lemps que mis pour atteindre \texttt{"vitesse\_desiree"}.
     
     \item \texttt{"rayon"} : Le rayon de la personne (representée comme un cercle), calculé comme 10 plus un nombre aléatoire compris entre -2 et 2. 
 \end{itemize}
