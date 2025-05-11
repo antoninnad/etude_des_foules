@@ -32,7 +32,7 @@ def initialiser_tab_personne():
                     "vitesse_desiree": 1.34
                     + random.randint(-1, 1) * random.randint(0, 25) * 0.01,
                     "vitesse": np.array([0, 0]),
-                    "tau": 0.2,
+                    "tau": 0.5,
                     "rayon": 10 + random.randint(-2, 2),
                 }
             )
