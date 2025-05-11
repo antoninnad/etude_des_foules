@@ -458,9 +458,77 @@ Pour cette simulation on obtient un temps moyen de \textbf{30.36 unités de temp
 
 On obtient une moyenne de temps sur 10 échantillons pour la classe avec 2 portes de 10.96 unités de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
 \paragraph{Conclusion}  Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire est un risque, en particulier en cas de panique ou de mouvements de foule. \\ \indent A noter que notre modèle aurait pu être plus proche de la réalité en ajoutant le principe de décision individuelle pour avoir des chemins différents.
+
+\section{Bonus : version Raylib}
+
+Une version alternative de la simulation a été développée en \textbf{C} en utilisant la bibliothèque graphique \href{https://www.raylib.com/}{Raylib}.
+
+\subsection{Compilation et exécution}
+
+\begin{verbatim}
+// Compilation :
+make so_release
+
+// Lancement :
+make so_release_exe
+\end{verbatim}
+
+Il est aussi possible d'utiliser directement l'exécutable compilé :
+
+\begin{verbatim}
+./so_release.out
+\end{verbatim}
+
+\subsection{Structure de l'interface}
+
+L'interface graphique est divisée en quatre parties principales :
+
+\begin{enumerate}
+  \item \textbf{Barre supérieure : sliders de configuration (de gauche à droite)}
+  \begin{itemize}
+    \item \textbf{time} : nombre de ticks par frame (60 FPS), affiché en puissance de dix.
+    \item \textbf{particule} : nombre de particules (entre 4 et 800), modifiable uniquement au lancement.
+    \item \textbf{door} : largeur de la porte.
+    \item \textbf{tau} : constante de relaxation, affichée en puissance de dix (contrôle la rapidité d’ajustement à la vitesse désirée).
+    \item \textbf{fild} : norme du champ vectoriel dictant la vitesse désirée.
+    \item \textbf{radius} : rayon approximatif (±5\%) des particules, modifiable seulement au lancement.
+    \item \textbf{obstacle} : position de l’obstacle selon l’axe X.
+    \item \textbf{wish} : distance désirée entre les particules (paramètre \( B_i \) du cours), affichée en puissance de dix.
+  \end{itemize}
+
+  \item \textbf{Barre latérale gauche : boutons de contrôle}
+  \begin{itemize}
+    \item \textbf{Play/Pause} : lance ou met en pause la simulation.
+    \item \textbf{Stop} : réinitialise la simulation.
+    \item \textbf{Cible} : champ vectoriel dirigeant les particules vers la sortie.
+    \item \textbf{Rotation 1} : champ circulaire autour du centre.
+    \item \textbf{Souris} : les particules suivent le curseur.
+    \item \textbf{Tête de mort} : mode débug avec visualisation des champs et hash map.
+    \item \textbf{Rotation 2} : champ circulaire dirigé vers et autour du centre.
+    \item \textbf{Grille} : active/désactive le mode hash map (optimisation des interactions).
+    \item \textbf{Triangle/Cercle} : change la forme de l’obstacle.
+  \end{itemize}
+
+  \item \textbf{Zone centrale : simulation}
+  \begin{itemize}
+    \item Visualisation des particules (départ aligné avec bruit aléatoire).
+    \item Cinq lignes rouges de délimitation.
+    \item Obstacle (cercle ou triangle).
+    \item Une ou deux portes, largeur modifiable.
+  \end{itemize}
+
+  \item \textbf{Bandeau inférieur : indicateurs de performance}
+  \begin{itemize}
+    \item Temps de rendu de l'interface (ms).
+    \item Temps de simulation (ms).
+    \item Nombre de FPS (frames par seconde).
+  \end{itemize}
+\end{enumerate}
+
+\subsection{Avantage de ce bonus}
+
+
 \newpage
-
-
 
 \section{Réferences}
 
