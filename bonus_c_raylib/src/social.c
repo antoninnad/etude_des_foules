@@ -36,7 +36,6 @@ Vec2 wall_closest_point(const Vec2 pos, const Wall w)
     if (lenght_len == 0)
         return (w.pos); // mur taille null
     const Vec2 len_nor = v2_scal_prod(1. / lenght_len, w.len);
-    // const Vec2 len_nor = v2_normalize(w.len);
 
     float k = v2_dot_prod(p_w, len_nor);
 
@@ -102,7 +101,6 @@ Vec2 force_personne_wall(const Personne *self, const Wall *wall)
 }
 Vec2 force_map_people(const Simulation_context *context, int self_index)
 {
-    // printf("mode\n");
     const Personne *self = &da_get(&context->pers, self_index);
 
     Vec2 res = (Vec2){0., 0.};
@@ -140,7 +138,6 @@ static inline Vec2 social_acceleration(Simulation_context *context, int self_ind
     );
 
     // People F
-    // socials_F = v2_add(socials_F, force_people(&context->pers, self_index));
     Vec2 people_F = (Vec2){NAN, NAN};
     if (context->mode_hash_map)
         people_F = force_map_people(context, self_index);
@@ -152,13 +149,6 @@ static inline Vec2 social_acceleration(Simulation_context *context, int self_ind
     for (int i = 0; i < walls->size; i++)
     {
         socials_F = v2_add(socials_F, force_personne_wall(self, &da_get(walls, i)));
-        /* const Vec2 closest = wall_closest_point(self->pos, walls->arr[i]);
-        const float scale = exp(
-            (walls->arr[i].radius + self->radius - v2_dist(closest, self->pos))
-                / self->wish_dist
-        );
-        const Vec2 n_i_self = v2_normalize(v2_diff(closest, self->pos));
-        socials_F = v2_add(socials_F, v2_scal_prod(-scale, n_i_self)); */
     }
     assert(socials_F.x != NAN);
     assert(socials_F.y != NAN);
@@ -196,27 +186,15 @@ static inline void euler_social(Simulation_context *context, const double step, 
     assert(0 <= self_index && self_index < context->pers.size);
     
     Personne *self = &da_get(&context->pers, self_index);
-    /* 
-    if (v2_lenght(self->speed) < .2)
-        self->back_step = 100;
-    else
-    {
-        self->back_step -= 1;
-        self->back_step = max(self->back_step, 0);
-    }
-    if (self->back_step
-     && self->wish_speed >= 0.)
-        self->wish_speed *= 0.; 
-    */
+
     Vec2 acceleration = social_acceleration(context, self_index, walls);
     
 
-    
 
     da_get(&context->pers, self_index).speed = v2_add(
         da_get(&context->pers, self_index).speed,
         v2_scal_prod(
-            step, // da_get(&context->pers, self_index).back_step ? step : -step,
+            step,
             acceleration
         )
     );
@@ -260,11 +238,6 @@ Vec2 fild_id(Vec2 v)
 
 Vec2 _fild_point(Vec2 v, Vec2 point)
 {
-    // Vec2 diff = v2_diff(point, v);
-    // float res = v2_lenght(diff);
-    // if (res == 0.)
-    //     return (Vec2){0., 1.};
-    // return v2_scal_prod(5., v2_scal_prod(1/res, diff));
     return v2_scal_prod(5., v2_normalize(v2_diff(point, v)));
 }
 Vec2 fild_door(Vec2 v)
@@ -342,9 +315,6 @@ void wish_update(da_Personne *obj, Vec2 (*fild)(Vec2), const Rectangle green_rec
             Vec2 fild_wish = obj->arr[i].fild(obj->arr[i].pos);
             obj->arr[i].wish_dir = v2_normalize(fild_wish);
             obj->arr[i].wish_speed = fild_strength;
-            // Vec2 fild_wish = v2_scal_prod(fild_strength, obj->arr[i].fild(obj->arr[i].pos));
-            // obj->arr[i].wish_dir = v2_normalize(fild_wish);
-            // obj->arr[i].wish_speed = v2_lenght(fild_wish);
         }
     }
 }
@@ -445,7 +415,6 @@ void add_obstacle(Simulation_context *context, float v)
 }
 void rm_obstacle(Simulation_context *context)
 {
-    // printf("rm\n");
     if (context->obstacle == circle)
         da_pop(&context->walls);
     else if (context->obstacle == triangle)
@@ -494,14 +463,6 @@ void populate_Wall(da_Wall *walls, Rectangle vir_canvas)
         .len = (Vec2){2.-vir_canvas.width, 0.},
         .radius = rad_wall
     }));
-    
-    /* da_push(walls, (Wall){0});
-    wall_add_triangle(walls, 
-        (Vec2){7.7,  4.  },
-        (Vec2){7.7,  6.  },
-        (Vec2){7. ,  5.  },
-        rad_wall
-    ); */
 }
 
 
@@ -538,7 +499,6 @@ void build_Hash_map(Hash_map *map, const da_Personne *personnes, const Rectangle
         int fix = hash_x_Hash_map(personne->pos, map, vir_canvas);
         // floor index y implicit ceil
         int fiy = hash_y_Hash_map(personne->pos, map, vir_canvas);
-        // Sprintf("%s -> %d,%d\n", v2_sprint(personne->pos), fix, fiy);
 
         DEBUG_ASSERT(0 <= fix);       DEBUG_ASSERT(fix < 1./map->ratio * vir_canvas.width);
         DEBUG_ASSERT(0 <= fiy);       DEBUG_ASSERT(fiy < 1./map->ratio * vir_canvas.height);
@@ -546,15 +506,7 @@ void build_Hash_map(Hash_map *map, const da_Personne *personnes, const Rectangle
         
 
         if (0 <= fiy && fiy < map->size && 0 <= fix && fix < map->size)
-            da_push(&map->array[fiy*map->size+fix], personne)              
-        /* for (int l = -1; l <= 1; l++)
-        {
-            for (int c = -1; c <= 1; c++)
-            {
-                if (0 <= fiy+l && fiy+l < map->size && 0 <= fix+c && fix+c < map->size)
-                    da_push(&map->array[(fiy+l)*map->size+(fix+c)], personne)              
-            }
-        } */
+            da_push(&map->array[fiy*map->size+fix], personne)
     }
 }
 
@@ -593,9 +545,9 @@ Window_handel init_window()
 
     Window_handel res = {0};
     
-    res.target_FPS = 60;//INT32_MAX;
+    res.target_FPS = 60;
     res.render_time = 0;
-    res.contexts = (da_ptr_Simulation_context){0};// *da_make(&res.contexts);
+    res.contexts = (da_ptr_Simulation_context){0};
 
 
     SetTraceLogLevel(LOG_NONE);
@@ -982,9 +934,7 @@ Simulation_context init_context(int nb_particule, float step)
     add_obstacle(&res, 7.);
 
     assert(res.vir_canvas.width == res.vir_canvas.height);
-    // res.map = init_Hash_map(1., res.vir_canvas);
     res.map = init_Hash_map(.5, res.vir_canvas);
-    // res.map = init_Hash_map(.25, res.vir_canvas);
     
 
     // restart_context equivalent 
@@ -1129,7 +1079,7 @@ void window_draw(Window_handel *win)
     BeginDrawing();
 
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-    foreach_ptr (Simulation_context *, context, &win->contexts)// i = 0; i < win->contexts.size; i++)
+    foreach_ptr (Simulation_context *, context, &win->contexts)
         context_draw(*context);
 
 
@@ -1142,11 +1092,9 @@ int main()
     Window_handel win = init_window();
     
     
-    // Simulation_context context = init_context(100, 0.0001);
     Simulation_context context = init_context(100, 0.0001);
     da_push(&win.contexts, &context);
-    // Simulation_context context2 = init_context(100, 0.001);
-
+    
     
 
 

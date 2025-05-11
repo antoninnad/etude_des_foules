@@ -525,10 +525,26 @@ L'interface graphique est divisée en quatre parties principales :
   \end{itemize}
 \end{enumerate}
 
-\subsection{Avantage de ce bonus}
+
+\subsection{Avantages de ce bonus}
+L'utilisation d'un langage de bas niveau a permis une optimisation bien plus poussée. Cela a notamment permis d'obtenir une précision élevée avec un pas de temps de $10^{-4}$, ainsi qu'un nombre maximum d'objets simulés de 800 (nombre choisi arbitrairement). L'algorithme de simulation de plusieurs personnes a une complexité temporelle de $\mathcal{O}(n^2)$, avec $n$ le nombre de personnes simulées, ce qui le rend rapidement très lent pour des situations impliquant un grand nombre de personne. Cependant, cette complexité n'est pas une fatalité. 
+Le modèle utilise une décroissance exponentielle :
+\begin{equation}
+\label{eq:force_sociale}
+\vec{f}_{ij}^{\text{s}} = \exp\left(\frac{r_{ij} - d_{ij}}{B_i}\right) \vec{n}_{ij}
+\end{equation}
+On remarque que lorsque $d_{ij}$ tend vers $+\infty$, l'expression de la force tend très rapidement vers zéro. On peut donc supposer que lorsque $d_{ij} \gg r_{ij}$, l'interaction entre les deux personnes est négligeable. Ainsi, dans la simulation, une simple condition permet d'éviter ce calcul lorsqu'il est inutile. Cette approche apporte quelques gains de performance, mais ne change pas la complexité théorique, qui reste en $\mathcal{O}(n^2)$.
+C'est pourquoi j'ai implémenté une approche plus lourde, mais qui permet de réduire la complexité à $\mathcal{O}(n \times m)$, avec $n$ le nombre de personnes et $m$ le nombre moyen de personnes par cellule. L'algorithme amélioré (activable avec le bouton \textbf{Grille}, l'avant-dernier bouton) se découpe en deux étapes :
+\begin{enumerate}
+
+\item Création de la grille : la zone simulée est associée à un tableau 2D, où chaque case représente une portion de cette zone. Chaque personne est référencée dans la case la plus proche. La création de la grille est implémentée dans la fonction $build\_Hash\_map()$.
+\item Calcul par case : chaque personne simule les interactions uniquement avec les personnes présentes dans les 9 cases les plus proches. Cette logique est implémentée dans $force\_map\_people()$.
+\end{enumerate}
+C'est cette optimisation qui permet d'obtenir des performances correctes avec un grand nombre de personnes simulées.
 
 
 \newpage
+
 
 \section{Réferences}
 
