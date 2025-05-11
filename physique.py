@@ -13,7 +13,7 @@ config = {
 
 """Normalise un vecteur"""
 def normalize_vector(vector):
-	"""Normalise un vecteur"""
+
 	norm = np.linalg.norm(vector)  # Calcul de la norme euclidienne
 	
 	if norm == 0:
@@ -121,7 +121,7 @@ def force_interaction_social(tab_personne, personne, indice, b0=config["b0"], se
 
 	return resultat
 
-""" angle entre deux vecteurs """
+""" Calcule l'angle entre deux vecteurs """
 def angle_entre_vecteur(u, v):
 	dot_product = np.dot(u, v)
 	norm_u = np.linalg.norm(u)
@@ -177,7 +177,22 @@ def distance_mur_vect(coord_a, coord_b, personne):
 
 
 	
-   
+"""
+	Calcule la force d'interaction sociale qu'a un mur sur une personne.
+
+	Cette fonction considère l'influence des quatres murs de la salle.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	indice	: l'indice de la personne dans le tableau de tous les individus
+ 	portes	: liste contenant l'ensemble des portes de sortie
+
+	Retours :
+	resultat: resultante des forces dues aux murs
+
+"""
 
 def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
 
@@ -252,9 +267,20 @@ def point_le_plus_proche_rectangle(personne : dict, rectangle : dict) -> np.arra
 	  + k1 * (vecteur_mur1)/ vecteur_mur1_longeur
 	  + k2 * (vecteur_mur2)/ vecteur_mur2_longeur
 	)
-		
-# donne le vecteur de répulsion d'un rectangle sur une personne
-# facilement modifible pour prendre n'importe quel forme de rectangle (rotation)
+
+
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle rectangulaire sur une personne.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	rectangle: dictionnaire représentant l'obstacle rectangulaire
+
+	Retours : force répulsive exercée par le rectangle considéré sur "personne"
+
+"""
 def force_interaction_rectangle(personne, rectangle, b0=config["b0"]):
 	point = point_le_plus_proche_rectangle(personne, rectangle)
 	
@@ -264,6 +290,20 @@ def force_interaction_rectangle(personne, rectangle, b0=config["b0"]):
 	return 15. * np.exp(- distance_mur / b0) * normalize_vector(personne["position"] - point)
 
 
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle circulaire sur une personne.
+
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	cercle: dictionnaire représentant l'obstacle cercle
+
+	Retours : 
+ 	resultat: force répulsive exercée par le rectangle considéré sur "personne"
+
+"""
+
 def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 	
 	resultat = np.array([0, 0])
@@ -277,19 +317,20 @@ def force_interaction_cercle(personne, cercle, b0=config["b0"]):
 		
 	return resultat
 
+"""
+	Calcule la force d'interaction sociale qu'a un obstacle quelconque sur une personne
+ 	en choisissant 
 
-def force_interaction_cercle(personne, cercle, b0=config["b0"]):
-	
-	resultat = np.array([0, 0])
-	
-	o = np.array([cercle["x"], cercle["y"]])
-	i = personne["position"]
-	
-	distance = np.linalg.norm(o - i) - cercle["rayon"] - personne["rayon"]
-	
-	resultat = resultat + np.exp((- distance / b0)) * 1.3*(i - o)
-		
-	return resultat
+	Paramètres :
+	personne (dict) : Un dictionnaire contenant des informations sur la personne, notamment :
+		- 'position' (numpy.ndarray) : La position actuelle de la personne.
+		- 'rayon' (flotteur) : Le rayon de la personne (considéré comme un cercle).
+	obstacle: liste de tous les obstacles existants
+
+	Retours : 
+ 	accumulateur : résultante des force exercée par le rectangle considéré sur "personne"
+
+"""
 
 def force_interaction_obstacle(personne, obstacles):
 	accumulateur = 0
@@ -481,25 +522,37 @@ def runge_kutta_4(tab_personne, personne,indice,obstacles, portes, step=.02):
     ])
 
 
+"""
+	Créer un graphe représentant les trajectoires de quelques individus
 
+	Paramètres :
+	fileName : chemin vers un fichier de coordonnées
 
-def plot_graphs():
-	
-	f = open('fichier_coords.txt', 'r')
-	
+"""
+def plot_graphs(fileName):
+
+	f = open(fileName, 'r')
 	coords = csv.DictReader(f, delimiter=';')
 	
-	x1, x2, x3 = [], [], []
-	y1, y2, y3 = [], [], []
-	
+	x1, x2, x3, x4, x5, x6 = [], [], [], [], [], []
+	y1, y2, y3, y4, y5, y6 = [], [], [], [], [], []
+
 	for row in coords:
+		
 		x1.append(float(row['x1'])*0.01)
 		x2.append(float(row['x2'])*0.01)
 		x3.append(float(row['x3'])*0.01)
+		x4.append(float(row['x4'])*0.01)
+		x5.append(float(row['x5'])*0.01)
+		x6.append(float(row['x6'])*0.01)
 		y1.append(float(row['y1'])*0.01)
 		y2.append(float(row['y2'])*0.01)
 		y3.append(float(row['y3'])*0.01)
-		
+		y4.append(float(row['y4'])*0.01)
+		y5.append(float(row['y5'])*0.01)
+		y6.append(float(row['y6'])*0.01)
+
+	f.close()
 	x1, x2, x3 = np.array(x1), np.array(x2), np.array(x3)
 	y1, y2, y3 = np.array(y1), np.array(y2), np.array(y3)
 
@@ -509,7 +562,10 @@ def plot_graphs():
 	plt.plot(x1, y1, color='r')
 	plt.plot(x2, y2, color='b')
 	plt.plot(x3, y3, color='g')
-	
+	plt.plot(x4, y4, color='black')
+	plt.plot(x5, y5, color='pink')
+	plt.plot(x6, y6, color='yellow')
+
 	plt.xlim(0, 6)
 	plt.ylim(0, 6)
 	
