@@ -91,8 +91,8 @@
 \subsection{Situation 2}
 \indent On repart sur les bases de la situation une, mais cette fois dans deux salles de cours. Les deux salles sont exactement identique à la différence que la salle 1 a une porte et que la salle 2 a deux portes. Le nombre total d'individu est de 31. Notre objectif est de voir si la porte en plus est vraiment utile.
 
-\subsection{Situation 3}
-\indent La troisième simulation proposée a pour objectif de vérifier le temps d'évacuation lorsqu'il y a un obstacle devant la sortie. En effet, nous avons vu en cours que ce temps devrait être plus court. Cette simulation reprend les conditions de la première (nombre d'individus, configuration de la salle...) 
+\paragraph{Note :}
+Une troisième simulation est disponible et a pour objectif d'observer le temps d'évacuation lorsqu'il y a un obstacle devant la sortie. En effet, nous avons vu en cours que ce temps devrait être plus court. Cette simulation reprend les conditions de la première (nombre d'individus, configuration de la salle...) 
 
 \
 \section{Théorie sous-jacente}
@@ -336,34 +336,34 @@ Au final, on observe un léger écart dû à la plus grande précision de la mé
 Cette section présente les différentes fonctions du fichier \textbf{physique.py}, accompagnées de leur signature pour faciliter leur identification dans le code.
 \subsubsection{Force motrice}
 
-Pour caculer la force motrice on applique simplement \eqref{eq:force_motrice}
+Pour calculer la force motrice on applique simplement \eqref{eq:force_motrice}
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
-def force_motrice(personne):
+def force_motrice(personne)
 \end{minted}
 
-La fonction \textbf{calcul\_i0} retourne le vecteur directionnel en soustrayant le point souhaité de la position actuelle de la personne, puis en normalisant le résultat comme suivant.
+La fonction \textbf{calcul\_i0} retourne le vecteur directionnel en soustrayant le point souhaité de la position actuelle de la personne, puis en normalisant le résultat comme suit :
 \\
-\indent Soient $a$ la position de la particule et $ptSouhaite$ les coordonnées de la porte :
+\indent Soient $\vec{a}$ la position de la particule et $ptSouhaite$ les coordonnées de la porte :
 \begin{equation}
-	\vec{e_\theta} = \vec{a} - \vec{ptSouhaite}
+	\vec{e_\theta} = \norm{\vec{a} - \vec{ptSouhaite}}
 \end{equation}
 
 
-\subsubsection{Force social(s)}
+\subsubsection{Force sociale(s)}
 
 
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
-def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50)
+def force_interaction_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50)
 \end{minted}
 
 Pour caculer on applique \eqref{eq:force_sociale}
 \\
 
-Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifié physiquement : au-delà de cette distance, l’influence sociale devient négligeable. A noté que cette valeur à été fixé expérimentalement.
+Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifié physiquement : au-delà de cette distance, l’influence sociale devient négligeable. A noté que cette valeur a été fixé expérimentalement.
 
 
-Pour calculer $d_{ij}$ onprend la norme de la position de la personne avec la norme de la personne avec laquel elle intéragis on soustrait en suite les deux rayon qui correspond à $r_{ij}$. $\vec{n_{ij}}$ est le vecteur normal ( a - b ) qu'on norme pour avoir un vecteur unitaire. 
+Pour calculer $d_{ij}$ on prend la norme de la différence des vecteurs positions de la personne considérée et de la personne avec laquelle il y a interaction. Il faut également penser à soustraire les distances représentants les deux rayons qui correspond à $r_{ij}$ avant de normer. $\vec{n_{ij}}$ est le vecteur normal de $j$ vers $i$ qu'on norme pour avoir un vecteur unitaire. 
 
 
 \subsubsection{Force répulsion mur}
@@ -374,6 +374,12 @@ La condition sert à ne pas agir si on a une porte.
 \
 La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). A PLUS DETAILLER +-*7g4rg
 
+\subsubsection{Force interaction cercle}
+\begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
+def force_interaction_cercle(personne, rectangle, b0=config["b0"]):
+\end{minted}
+
+Le cercle est un obstacle très pratique à manipuler et à implémenter. En effet, le code est presque identique à celui gérant les interactions sociales car les individus sont aussi représentés par des cercles. Un obstacle circulaire, du point de vue du code, est un individu immobile.
 
 \subsubsection{Force interaction rectangle}
 
@@ -384,7 +390,7 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 Pour cette méthode on a créé une fonction qui détermine le point le plus proche d'un rectangle. Selon la méthode suivante
 
 
-\paragraph{Vecteurs de Projection :}
+\paragraph{Vecteurs de projection :}
 
 Soit un rectangle défini par ses coordonnées de coin inférieur gauche $(x, y)$, sa longueur $l$, et sa hauteur $h$. Nous définissons deux vecteurs :
 \begin{itemize}
@@ -392,14 +398,14 @@ Soit un rectangle défini par ses coordonnées de coin inférieur gauche $(x, y)
     \item $\vec{v}_{\text{hauteur}} = (0, h)$ : vecteur représentant la hauteur du rectangle.
 \end{itemize}
 
-\paragraph{Position Relative :}
+\paragraph{Position relative :}
 
 La position de la personne par rapport au coin inférieur gauche du rectangle est donnée par le vecteur :
 \[
 \vec{p}_{\text{relatif}} = (x_{\text{personne}} - x, y_{\text{personne}} - y)
 \]
 
-\paragraph{Projection sur les Bords du Rectangle :}
+\paragraph{Projection sur les bords du rectangle :}
 
 Pour trouver le point le plus proche sur le rectangle, on projette $\vec{p}_{\text{relatif}}$ sur les vecteurs $\vec{v}_{\text{longueur}}$ et $\vec{v}_{\text{hauteur}}$. On a donc les projections :
 
@@ -408,7 +414,7 @@ k_1 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{longueur}}}{\|\vec{v}
 k_2 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{hauteur}}}{\|\vec{v}_{\text{hauteur}}\|^2}
 \end{align*}
 
-\paragraph{Ajustement des Projections :}
+\paragraph{Ajustement des projections :}
 
 Les valeurs de $k_1$ et $k_2$ sont ajustées pour s'assurer qu'elles se situent dans le rectangle :
 \begin{itemize}
@@ -418,7 +424,7 @@ Les valeurs de $k_1$ et $k_2$ sont ajustées pour s'assurer qu'elles se situent 
     \item Si $k_2 > h$, alors $k_2 = h$.
 \end{itemize}
 
-\paragraph{Calcul du Point le Plus Proche :}
+\paragraph{Calcul du point le plus proche :}
 
 Le point le plus proche sur le rectangle est donc :
 \[
@@ -427,17 +433,21 @@ Le point le plus proche sur le rectangle est donc :
 
 Pour finir on applique \eqref{eq:force_sociale} ici $r_{ij}$ = $r_i$ - 0 car pas de rayon.
 
-\subsection{Resolution}
+\subsubsection{Resultante}
 
-\textbf{Situation 1}
+\begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
+def resultante(tab_personne, personne,indice,obstacles, portes, evacuation)
+\end{minted}
 
-Bdf trois forces:
+Cette fonction établit le bilan des quatre forces considérées :
 \begin{itemize}
 	\item \textbf{forces motrices} \eqref{eq:force_motrice}
 	\item \textbf{forces interactions personnes} \eqref{eq:force_sociale}
 	\item \textbf{forces interactions murs} \eqref{eq:force_sociale}
+ 	\item \textbf{forces interactions obstacles} \eqref{eq:force_sociale}
 \end{itemize}
-Mais on peut ajouter aussi, les forces d'interaction avec les obstacles comme il n'y a pas de mur le vecteur sera $\vec{0}$.
+et renvoie la résultante de ces forces. Elle est utilisée lors de la résolution numérique de l'équation par les fonctions \texttt{"euler"}, \texttt{"runge_kutta_2"} et \texttt{"runge_kutta_4"} qui ont déjà été présentées.
+
 \\
 \\
 \textbf{donc au final on obtient une fonction euler qui généralise les deux cas}
@@ -460,8 +470,8 @@ Pour cette simulation on obtient un temps moyen de \textbf{30.36 unités de temp
 
 \includegraphics[width=\textwidth]{resultat_2.png} % moitié de la largeur du texte
 
-On obtien une moyenne de temps sur 10 échentillons pour la classe avec 2 portes de 10.96 unité de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
-\paragraph{Conclusion} Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire augmente le risque de blessure, en particulier en cas de panique ou de mouvements de foule désorganisés. \\ \indent A noter que notre model aurait pu être plus proche de la réalité en ajoutant le principe de décision individuel pour avoir des chemins différents.
+On obtient une moyenne de temps sur 10 échantillons pour la classe avec 2 portes de 10.96 unité de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
+\paragraph{Conclusion} Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire augmente le risque de blessure, en particulier en cas de panique ou de mouvements de foule désorganisés. \\ \indent De plus, notre modèle reste très éloigné de la réalité. En effet, il néglige et omet beaucoup de principes fondamentaux tels que le prise de décisions individuelles ou encore l'anticipation. Il s'agit donc d'un modèle de Helbing très simplifié qui permet toutefois d'observer la structure générale d'un foule.
 
 \newpage
 
