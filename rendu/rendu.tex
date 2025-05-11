@@ -85,16 +85,22 @@
 \setcounter{page}{1} % -- met la page à 1 --
 
 \section{Objectif}
-\subsection{Situation 1}
-\indent La première situation (imposée) dans le cadre de cette étude, consiste à modéliser l’évacuation d’une foule depuis un espace rectangulaire, tel qu’une salle. Les individus se dirigent vers une sortie sous l'effet d'une force motrice, tout en interagissant les uns avec les autres par le biais de forces sociales. Chaque individu est associé à une vitesse cible, représentant son intention de déplacement. L'objectif est d'avoir le temps d'évacuation totale pour la foulle. Dans cette simulation le nombre de personne est fixé à 45.
 
-\subsection{Situation 2}
-\indent On repart sur les bases de la situation une, mais cette fois dans deux salles de cour. Les deux salles sont exactement identique à la différence que la salle 1 a une porte et que la salle 2 a deux portes. Le nombre d'individu (étudiant + éléve) est de 31. Notre objectif est de voir si la porte en plus est vraiment utile.
+Cette étude s’inscrit dans le cadre d’un travail de foulométrie, visant à modéliser et analyser les dynamiques d’évacuation d’un groupe d’individus dans des environnements clos. À travers différentes configurations, nous cherchons à comprendre l’impact de la configuration des lieux (taille, nombre de sorties) sur le temps d’évacuation global. Deux scénarios ont été définis pour cette analyse.
 
+\subsection{Évacuation depuis une salle unique}
+
+La première situation, imposée dans le cadre de l’étude, consiste à simuler l’évacuation d’une foule depuis un espace rectangulaire fermé, tel qu’une salle. Les individus cherchent à rejoindre la sortie, guidés par une force motrice représentant leur objectif de déplacement. Ils interagissent entre eux via des forces sociales modélisant leur tendance à éviter les collisions. Chaque individu possède une vitesse cible.
+L’objectif de cette simulation est de déterminer le temps d’évacuation complet pour l’ensemble des 45 personnes présentes dans la salle.
+
+\subsection{Comparaison entre une et deux issues de secours}
+
+Dans ce second scénario, deux salles identiques sont considérées, à l’exception du nombre de sorties : la salle 1 dispose d’une seule porte, tandis que la salle 2 en possède deux. Les deux espaces accueillent un total de 31 individus (composés d'un professeur et d'étudiants).
+L’objectif est ici de quantifier l’impact de la présence d’une issue supplémentaire sur l’efficacité de l’évacuation, en comparant les temps d’évacuation des deux configurations.
 \
 \section{Théorie sous-jacente}
 
-Le modèle de force sociale, introduit par Helbing et Molnár\footnote{\url{https://doi.org/10.1103/PhysRevE.51.4282}}, vise à simuler le comportement de piétons dans des environnements denses, en représentant chaque individu comme une particule soumise à des forces comportementales. Deux forces fondamentales structurent ce modèle : la force motrice et la force sociale.
+Nous nosu somme appuyé sur le modèle de force sociale, de Helbing et Molnár\footnote{\url{https://doi.org/10.1103/PhysRevE.51.4282}}, vise à simuler le comportement de piétons dans des environnements denses, en représentant chaque individu comme une particule soumise à des forces comportementales. Deux forces fondamentales structurent ce modèle : la force motrice et la force sociale.
 
 \paragraph{Force motrice.}
 Chaque individu $i$ cherche à atteindre une vitesse souhaitée $\vec{v}_i^0$ dans une direction donnée. Ce comportement est modélisé par une force motrice, qui pousse l'individu à ajuster sa vitesse actuelle $\vec{v}_i$ à sa vitesse désirée, selon :
@@ -130,7 +136,8 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 \subsection{Determiner l'équation}
 
 \indent Afin d’établir l’équation, nous avons tout d’abord supposé que le référentiel d’étude est galiléen, pour ensuite appliquer la seconde loi de newton $\sum \vec{F}_{\text{particule}} = m_{\text{particule}} \vec{a}$.
-\\On a:
+\\(on ne considère pas le poid ni la réaction du support car selon $\vec{e_z}$)
+\\ On a:
 \[
 \vec{f}_{\text{direction}} + \vec{f}_{\text{social}} = m_{\text{particule}} \frac{d\vec{v}}{dt}.
 \]
@@ -409,7 +416,7 @@ Pour finir on applique \eqref{eq:force_sociale} ici $r_{ij}$ = $r_i$ - 0 car pas
 
 \textbf{Situation 1}
 
-Bilan des forces appliquées :
+Bilan des forces :
 Trois types de forces principales agissent sur l’individu :
 \begin{itemize}
 \item \textbf{Les forces motrices}, modélisées par l’équation \eqref{eq:force_motrice} ;
