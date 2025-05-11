@@ -119,12 +119,12 @@ Les piétons interagissent entre eux via des forces dites sociales, traduisant l
 
 \begin{equation}
 \label{eq:force_sociale}
-\vec{f}_{ij}^{\text{s}} = A_i \exp\left(\frac{r_{ij} - d_{ij}}{B_i}\right) \vec{n}_{ij}
+\vec{f}_{ij}^{\text{s}} = \exp\left(\frac{r_{ij} - d_{ij}}{B_i}\right) \vec{n}_{ij}
 \end{equation}
 
 où :
 \begin{itemize}
-  \item  $B_i$ est une constantes ( la zone de confort de la personne i),
+  \item  $B_i$ est une constante ( la zone de confort de la personne i),
   \item $r_{ij}$ est la somme des rayons des individus respectifs $i$ et $j$,
   \item $d_{ij}$ est la distance entre les centres des deux individus (ou individu masse),
   \item $\vec{n}_{ij}$ est le vecteur unitaire (de $j$ vers $i$).
@@ -137,7 +137,7 @@ Ces forces permettent de modéliser des comportements réalistes d’évitement.
 
 \subsection{Determiner l'équation}
 
-\indent Afin d’établir l’équation, nous avons tout d’abord supposé que le référentiel d’étude est galiléen, pour ensuite appliquer la seconde loi de newton $\sum \vec{F}_{\text{particule}} = m_{\text{particule}} \vec{a}$.
+\indent Afin d’établir l’équation, nous avons tout d’abord supposé que le référentiel d’étude est galiléen, pour ensuite appliquer la seconde loi de newton $\sum \vec{F}_{\text{ext}} \{particule\} = m_{\text{particule}} \vec{a}$.
 \\(on ne considère pas le poid ni la réaction du support car selon $\vec{e_z}$)
 \\ On a:
 \[
@@ -150,10 +150,10 @@ Ces forces permettent de modéliser des comportements réalistes d’évitement.
 \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} + \frac{1}{m_{\text{particule}}} \sum_{j \neq i}  \exp\left( \frac{r_{ij} - d_{ij}}{B_i} \right) \vec{n}_{ij} = \frac{d\vec{v}}{dt}
 \end{equation}
 
-\subsection{Resolution d'équation différentiel}
+\subsection{Resolution d'équation différentielle}
 \subsubsection{Contextualisation}
 
-\indent Pour résoudre \eqref{eq:eq_diff}. Nous avons décider d'utiliser méthode d'euler:
+\indent Pour résoudre \eqref{eq:eq_diff}. Nous avons décidé d'utiliser la méthode d'Euler (car meilleure complexité temporelle). Nous avons aussi implémenté Runge-Kutta à l'ordre 2 et 4:
 \[
 \vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot \vec{F}_n
 \]
@@ -180,22 +180,23 @@ Ces forces permettent de modéliser des comportements réalistes d’évitement.
     
     \item \texttt{"vitesse"} : Un tableau NumPy qui représente la vitesse initiale de la personne. La vitesse initiale est définie comme un vecteur nul \([0, 0]\) (immobile au départ)
     
-    \item \texttt{"to"} : Un paramètre fixé à 0.2. Il pourrait représenter un coefficient de friction, de résistance ou tout autre facteur de modification des interactions.
+    \item \texttt{"to"} : fixé à 0.2 (capacité à être à l'aise proche d'une autre personne
     
-    \item \texttt{"rayon"} : Le rayon de la personne (representée comme un cercle), calculé comme 10 plus un nombre aléatoire compris entre -2 et 2. 
+    \item \texttt{"rayon"} : Le rayon de la personne (representée comme un cercle), fixé à  10 plus un nombre aléatoire compris entre -2 et 2. 
 \end{itemize}
 
-\subsubsection{Présentation du code}
+\paragraph{Equation à résoudre}
 
-Voici un exemple pour resoudre l'equation différentiel suivante (force motrice):
+On cherche à résoudre l'équation différentielle avec comme force seulement la force motrice pour simplifier l'interprétation graphique.
 
 \begin{equation}
 \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} = \frac{d\vec{v}}{dt}
 \end{equation}
 
-\newpage
+\subsubsection{Méthode Euler}
 
-\textbf{Le code qui permet de resoudre donc l'equation differentiel:}
+
+\textbf{Le code qui permet de résoudre l'equation differentielle avec Euler est:}
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
 def euler(tab_personne, personne,indice, step=.02):
@@ -235,17 +236,17 @@ def euler(tab_personne, personne,indice, step=.02):
 
 \subsubsection{Résultat graphique}
 \
-On lance le progamme, sur une particule on recupère les diverses valeurs de $V_n$ pour en suite tracer la courbe si dessous (la paricule démarre à la position $(0,0)$ et vise le point $(100,100)$:
+On lance le progamme, sur une particule on recupère les valeurs de $V_n$ pour ensuite tracer la courbe si dessous (la particule démarre à la position $(0,0)$ et vise le point $(100,100)$):
 
 
 \includegraphics[width=\textwidth]{graph_vitesse.png} % moitié de la largeur du texte
 
-Le résultat est bien cohérent on voit que la particule atteint à la manière d'une exponentielle inversé sa $v_{desiree}$ pour en suite l'atteindre totale. Dès que la position $(100,100)$ est atteinte sa vitesse décroit pour revenir vers la position. On voit qu'en suite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
+Le résultat est bien cohérent. On voit que la particule atteint à la manière d'une exponentielle inversé sa $v_{desiree}$ pour ensuite l'atteindre totalement. Dès que la position $(100,100)$ est atteinte sa vitesse décroit pour revenir vers la position souhaitée. On voit qu'en suite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
 
 
 \subsection*{Méthode de Runge-Kutta d'ordre 2}
 
-Cette méthode plus couteuse temporellement s'avére être plus précise qu'euler.
+Cette méthode plus couteuse temporellement s'avére être plus précise qu'Euler.
 
 L’équation générale est :
 \[
@@ -270,7 +271,7 @@ k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
     \[
     \vec{v} \mathrel{+}= \frac{1}{2} k_1
     \]
-    \item Ensuite, on recalcule la force et :
+    \item Ensuite, on recalcule la force:
     \[
     k_2 = h \cdot \texttt{resultante(...)}
     \]
@@ -279,7 +280,8 @@ k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
     \vec{v}_{n+1} = \vec{v}_n + k_2
     \]
 \end{itemize}
-(voir code)
+\hspace{1em}
+A noter que $resultante()$ dans ce cas renvoie que la force motrice. Voici sa signature (pour la retrouver dans le code):
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
 def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02)
 \end{minted}
@@ -287,7 +289,7 @@ def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02)
 
 \includegraphics[width=\textwidth]{runge.png}
 
-Au final, on observe un léger écart, dû à la plus grande précision de la méthode de Runge-Kutta. Mais cette écart sur la vitesse n'a pas un grans impact sur la position à en croire le graphique suivant:
+Au final, on observe un léger écart, dû à la plus grande précision de la méthode de Runge-Kutta. Mais cette écart sur la vitesse n'a pas un grand impact sur la position à en croire le graphique suivant:
 
 \includegraphics[width=\textwidth]{runge_pos.png}
 
@@ -297,18 +299,18 @@ Au final, on observe un léger écart, dû à la plus grande précision de la m�
 \subsection{Structure et contextualisation}
 \noindent Le code est divisé en trois modules distincts:
 \begin{itemize}
-	\item \textbf{main.py} s'occupe de dessiner la fênetre de gérer plusieurs actions il initialise le tableau de personne (tableau de particule)
+	\item \textbf{main.py} s'occupe de dessiner la fenêtre de gérer plusieurs actions. Il initialise le tableau de personnes (tableau de particule)
 	
-	\item \textbf{physique.py} contient uniquement des fonction pour la gestion physique
+	\item \textbf{physique.py} contient uniquement des fonctions pour la gestion physique
 	
-	\item \textbf{affichage.py} contient les situations et centralise la gestion des dessin dans le canvas
+	\item \textbf{affichage.py} contient les situations et centralise la gestion des dessins dans le canvas
 \end{itemize}
 
 \subsection{Modélisation physique}
 Cette section présente les différentes fonctions du fichier \textbf{physique.py}, accompagnées de leur signature pour faciliter leur identification dans le code.
 \subsubsection{Force motrice}
 
-Pour caculer la force motrice on applique simplement \eqref{eq:force_motrice}
+Pour calculer la force motrice on applique simplement \eqref{eq:force_motrice}
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
 def force_motrice(personne):
@@ -322,20 +324,20 @@ La fonction \textbf{calcul\_i0} retourne le vecteur directionnel en soustrayant 
 \end{equation}
 
 
-\subsubsection{Force social(s)}
+\subsubsection{Force sociale(s)}
 
 
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
 def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50)
 \end{minted}
 
-Pour caculer on applique \eqref{eq:force_sociale}
+Pour calculer on applique \eqref{eq:force_sociale}
 \\
 
-Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifiable physiquement une personne à une certaine distance d'un autre individu n'agissent pas deux à deux entre elle. A noté que cette valeur à été fixé expérimentalement.
+Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifiable physiquement, une personne à une certaine distance d'un autre individu n'agissent pas deux à deux entre elle. A noté que cette valeur à été fixé expérimentalement.
 
 
-Pour calculer $d_{ij}$ onprend la norme de la position de la personne avec la norme de la personne avec laquel elle intéragis on soustrait en suite les deux rayon qui correspond à $r_{ij}$. $\vec{n_{ij}}$ est le vecteur normal ( a - b ) qu'on norme pour avoir un vecteur unitaire. 
+Pour calculer $d_{ij}$ on prend la norme de la position de la personne avec la norme de la personne avec laquelle elle intéragit. On soustrait ensuite les deux rayons qui correspondent à $r_{ij}$. $\vec{n_{ij}}$ est le vecteur normal ( a - b ) qu'on norme pour avoir un vecteur unitaire. 
 
 
 \subsubsection{Force répulsion mur}
@@ -344,23 +346,20 @@ Pour calculer $d_{ij}$ onprend la norme de la position de la personne avec la no
 def force_interaction_social_mur(personne, indice, portes, b0 = config["b0"]):
 \end{minted}
 
-La force de repulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agis sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois ci on utilise pythagore.
+Pour déterminer la force de répulsion on calcule la distance avec les 4 murs grâce à la trigonométrie. 
 
 \
 La condition sert à ne pas agir si on a une porte.
 \
-La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). Pour mieux comprendre voici un exemple:
+La fonction \texttt{distance\_mur\_vect} utilise le sinus. Elle renvoie un tuple avec, premièrement, la distance entre le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{ij}}$). Pour mieux comprendre voici un exemple:
 
 \includegraphics[width=\textwidth]{explication.png}
 
 On a déjà la longueur \( AB \) et on cherche \( AC \), on obtient facilement l'angle \( \widehat{ABC} \) que l'on notera \( \alpha \). \\
-On a alors : \( BC = \sin(\alpha) \cdot AB \)
+On a alors : \( AC = \sin(\alpha) \cdot AB \)
 \\
 \\
-Finalement d'après le théorème de pythagore $\sqrt{AB^2 - CB^2} = AC$, pour le vecteur normal on en déduit les coordonnés de c pour en suite normaliser $\vec{CA}$.
-\\
-\\
-\indent Cette opération est répétée pour les autres murs de manière casi analogue. Une condition supplémentaire est ajoutée afin d’ignorer la zone correspondant à l’emplacement de la porte.
+\indent Cette opération est répétée pour les autres murs de manière quasi analogue. Une condition supplémentaire est ajoutée afin d’ignorer la zone correspondant à l’emplacement de la porte.
 
 \subsubsection{Force interaction rectangle}
 
@@ -371,7 +370,7 @@ def force_intercation_rectangle(personne, rectangle, b0=config["b0"]):
 Pour cette méthode on a créé une fonction qui détermine le point le plus proche d'un rectangle. Selon la méthode suivante
 
 
-\paragraph{Vecteurs de Projection :}
+\paragraph{Vecteurs de projection :}
 
 Soit un rectangle défini par ses coordonnées de coin inférieur gauche $(x, y)$, sa longueur $l$, et sa hauteur $h$. Nous définissons deux vecteurs :
 \begin{itemize}
@@ -379,14 +378,14 @@ Soit un rectangle défini par ses coordonnées de coin inférieur gauche $(x, y)
     \item $\vec{v}_{\text{hauteur}} = (0, h)$ : vecteur représentant la hauteur du rectangle.
 \end{itemize}
 
-\paragraph{Position Relative :}
+\paragraph{Position relative :}
 
 La position de la personne par rapport au coin inférieur gauche du rectangle est:
 \[
 \vec{p}_{\text{relatif}} = (x_{\text{personne}} - x, y_{\text{personne}} - y)
 \]
 
-\paragraph{Projection sur les Bords du Rectangle :}
+\paragraph{Projection sur les bords du rectangle :}
 
 Pour trouver le point le plus proche sur le rectangle, on projette $\vec{p}_{\text{relatif}}$ sur les vecteurs $\vec{v}_{\text{longueur}}$ et $\vec{v}_{\text{hauteur}}$. On a donc:
 
@@ -395,7 +394,7 @@ k_1 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{longueur}}}{\|\vec{v}
 k_2 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{hauteur}}}{\|\vec{v}_{\text{hauteur}}\|^2}
 \end{align*}
 
-\paragraph{Ajustement des Projections :}
+\paragraph{Ajustement des projections :}
 
 Les valeurs de $k_1$ et $k_2$ sont ajustées (pour s'assurer qu'elles se situent bien dans le rectangle) :
 \begin{itemize}
@@ -405,7 +404,7 @@ Les valeurs de $k_1$ et $k_2$ sont ajustées (pour s'assurer qu'elles se situent
     \item Si $k_2 > h$, alors $k_2 = h$.
 \end{itemize}
 
-\paragraph{Calcul du Point le Plus Proche :}
+\paragraph{Calcul du point le plus proche :}
 
 Le point le plus proche sur le rectangle est donc :
 \[
@@ -434,7 +433,7 @@ Ainsi, on peut généraliser le système via une fonction basée sur la méthode
 
 \vspace{1em}
 
-C'est ce que font les fonctions de résolutions suivantes.
+C'est ce que font les fonctions de résolution suivantes.
 
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
 def runge_kutta_2(tab_personne, personne,indice,obstacles, portes, step=.02):
@@ -444,7 +443,7 @@ def euler(tab_personne, personne,indice,obstacles, portes, step=.02):
 
 
 \section{Analyse}
-Le temps de notre expérience est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dû à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
+Le temps de notre expérience est en unité de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dûes à la vitesse qui varie de $1.34 \pm 0.25 $ unité de vitesse avec aussi le rayon qui oscille de $10 \pm 2$ unités de longueur.
 \subsection{Situation 1}
 
 \includegraphics[width=\textwidth]{resultat.png} % moitié de la largeur du texte
@@ -457,8 +456,8 @@ Pour cette simulation on obtient un temps moyen de \textbf{30.36 unités de temp
 
 \includegraphics[width=\textwidth]{resultat_2.png} % moitié de la largeur du texte
 
-On obtien une moyenne de temps sur 10 échentillons pour la classe avec 2 portes de 10.96 unité de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
-\paragraph{Conclusion}  Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire est un risque, en particulier en cas de panique ou de mouvements de foule. \\ \indent A noter que notre model aurait pu être plus proche de la réalité en ajoutant le principe de décision individuel pour avoir des chemins différents.
+On obtient une moyenne de temps sur 10 échantillons pour la classe avec 2 portes de 10.96 unités de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
+\paragraph{Conclusion}  Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire est un risque, en particulier en cas de panique ou de mouvements de foule. \\ \indent A noter que notre modèle aurait pu être plus proche de la réalité en ajoutant le principe de décision individuelle pour avoir des chemins différents.
 \newpage
 
 
