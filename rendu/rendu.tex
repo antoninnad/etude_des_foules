@@ -162,7 +162,7 @@ où $\Omega$ représente l'ensemble des obstacles.
 
 \indent Pour résoudre \eqref{eq:eq_diff}, nous allons utiliser trois méthodes différentes. La première est la méthode d'Euler : 
 \[
-\vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot frac{d\vec{v}}{dt}
+\vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot \frac{d\vec{v}}{dt}
 \]
 L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
 \\ On introduit une personne modélisée en Python par un dictionnaire (pour mieux comprendre la fonction qui permet de résoudre cette équation) :
@@ -315,7 +315,7 @@ Au final, on observe un léger écart dû à la plus grande précision de la mé
 
 \includegraphics[width=\textwidth]{runge_pos.png}
 
-Cependant, lorsqu'on considère plusieurs personnes et leurs interactions, la différence est plus notable :
+Cependant, lorsqu'on considère plusieurs personnes et leurs interactions, la différence entre les trajectoires d'un même individu est plus notable :
 
 \includegraphics[width=\textwidth]{differences_euler_rk.png}
 
