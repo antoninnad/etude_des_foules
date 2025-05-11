@@ -86,21 +86,23 @@
 
 \section{Objectif}
 
-Cette étude s’inscrit dans le cadre d’un travail de foulométrie, visant à modéliser et analyser les dynamiques d’évacuation d’un groupe d’individus dans des environnements clos. À travers différentes configurations, nous cherchons à comprendre l’impact de la configuration des lieux (taille, nombre de sorties) sur le temps d’évacuation global. Deux scénarios ont été définis pour cette analyse.
+Cette étude s’inscrit dans le cadre d’un travail de foulométrie, visant à modéliser et analyser les dynamiques d’évacuation d’un groupe d’individus dans des environnements clos. À travers différentes configurations, nous cherchons à comprendre l’impact de la configuration des lieux sur le temps d’évacuation global. Deux scénarios ont été étudiés dans cette analyse.
 
 \subsection{Évacuation depuis une salle unique}
 
-La première situation, imposée dans le cadre de l’étude, consiste à simuler l’évacuation d’une foule depuis un espace rectangulaire fermé, tel qu’une salle. Les individus cherchent à rejoindre la sortie, guidés par une force motrice représentant leur objectif de déplacement. Ils interagissent entre eux via des forces sociales modélisant leur tendance à éviter les collisions. Chaque individu possède une vitesse cible.
-L’objectif de cette simulation est de déterminer le temps d’évacuation complet pour l’ensemble des 45 personnes présentes dans la salle.
+Dans ce second scénario, on a deux salles identiques, mais leurs nombres de sortie est différent. En effet la salle 1 dispose d’une seule porte, tandis que la salle 2 en a deux. Les deux espaces accueillent 31 personnes (composés d'un professeur et d'étudiants).
+L’objectif est ici de quantifier l’impact de la présence d’une issue supplémentaire sur l’efficacité de l’évacuation, en comparant les temps d’évacuation des deux configurations.
 
 \subsection{Comparaison entre une et deux issues de secours}
 
-Dans ce second scénario, deux salles identiques sont considérées, à l’exception du nombre de sorties : la salle 1 dispose d’une seule porte, tandis que la salle 2 en possède deux. Les deux espaces accueillent un total de 31 individus (composés d'un professeur et d'étudiants).
+Dans ce second scénario, on a deux salles identiques, à l’exception du nombre de sorties : la salle 1 dispose d’une seule porte, tandis que la salle 2 en possède deux. Les deux espaces accueillent un total de 31 individus (composés d'un professeur et d'étudiants).
 L’objectif est ici de quantifier l’impact de la présence d’une issue supplémentaire sur l’efficacité de l’évacuation, en comparant les temps d’évacuation des deux configurations.
 \
 \section{Théorie sous-jacente}
 
-Nous nosu somme appuyé sur le modèle de force sociale, de Helbing et Molnár\footnote{\url{https://doi.org/10.1103/PhysRevE.51.4282}}, vise à simuler le comportement de piétons dans des environnements denses, en représentant chaque individu comme une particule soumise à des forces comportementales. Deux forces fondamentales structurent ce modèle : la force motrice et la force sociale.
+Nous nous somme appuyé sur les travaux du modèle de force sociale, de Helbing et Molnár
+\footnote{Lien vers l'étude \url{https://doi.org/10.1103/PhysRevE.51.4282}}
+, visant à simuler le comportement de piétons dans des foules. Il y a deux forces principales dans ce modèle : la force motrice et la force d'interaction.
 
 \paragraph{Force motrice.}
 Chaque individu $i$ cherche à atteindre une vitesse souhaitée $\vec{v}_i^0$ dans une direction donnée. Ce comportement est modélisé par une force motrice, qui pousse l'individu à ajuster sa vitesse actuelle $\vec{v}_i$ à sa vitesse désirée, selon :
@@ -110,10 +112,10 @@ Chaque individu $i$ cherche à atteindre une vitesse souhaitée $\vec{v}_i^0$ da
 \vec{f}_i^{\text{m}} = m_i \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i}
 \end{equation}
 
-où $m_i$ est la masse de l'individu et $\tau_i$ est un temps de relaxation caractérisant la rapidité avec laquelle l'individu tente d’atteindre sa vitesse cible.
+où $m_i$ est la masse de l'individu et $\tau_i$ est le temps de relaxation modélisant la rapidité avec laquelle l'individu peut atteindre sa vitesse cible.
 
-\paragraph{Force sociale.}
-Outre la volonté individuelle de se diriger vers une destination, les piétons interagissent entre eux via des forces dites sociales, traduisant leur tendance à maintenir une distance interpersonnelle. Ces interactions sont modélisées par une force répulsive de la forme :
+\paragraph{Force interaction.}
+Les piétons interagissent entre eux via des forces dites sociales, traduisant leur tendance à maintenir une distance avec d'autres personnes, aussi les piètons intéragissent avec l'environnement avec des forces dites d'intércation. Ces interactions sont traduites par la même modélisation:
 
 \begin{equation}
 \label{eq:force_sociale}
@@ -122,13 +124,13 @@ Outre la volonté individuelle de se diriger vers une destination, les piétons 
 
 où :
 \begin{itemize}
-  \item  $B_i$ est une constantes positives liée à la zone de confort de la personne i,
-  \item $r_{ij}$ est la somme des rayons corporels des individus $i$ et $j$,
-  \item $d_{ij}$ est la distance entre les centres de masse des deux individus,
-  \item $\vec{n}_{ij}$ est le vecteur unitaire pointant de $j$ vers $i$.
+  \item  $B_i$ est une constantes ( la zone de confort de la personne i),
+  \item $r_{ij}$ est la somme des rayons des individus respectifs $i$ et $j$,
+  \item $d_{ij}$ est la distance entre les centres des deux individus (ou individu masse),
+  \item $\vec{n}_{ij}$ est le vecteur unitaire (de $j$ vers $i$).
 \end{itemize}
 
-Ces forces permettent de simuler des comportements réalistes d’évitement et de gestion de l’espace dans des environnements contraints, comme lors d’une évacuation.
+Ces forces permettent de modéliser des comportements réalistes d’évitement.
 
 
 \section{Méthode}
@@ -330,7 +332,7 @@ def force_intercation_social(tab_personne, personne, indice, b0=config["b0"], se
 Pour caculer on applique \eqref{eq:force_sociale}
 \\
 
-Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifié physiquement : au-delà de cette distance, l’influence sociale devient négligeable. A noté que cette valeur à été fixé expérimentalement.
+Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifiable physiquement une personne à une certaine distance d'un autre individu n'agissent pas deux à deux entre elle. A noté que cette valeur à été fixé expérimentalement.
 
 
 Pour calculer $d_{ij}$ onprend la norme de la position de la personne avec la norme de la personne avec laquel elle intéragis on soustrait en suite les deux rayon qui correspond à $r_{ij}$. $\vec{n_{ij}}$ est le vecteur normal ( a - b ) qu'on norme pour avoir un vecteur unitaire. 
@@ -395,7 +397,7 @@ k_2 &= \frac{\vec{p}_{\text{relatif}} \cdot \vec{v}_{\text{hauteur}}}{\|\vec{v}_
 
 \paragraph{Ajustement des Projections :}
 
-Les valeurs de $k_1$ et $k_2$ sont ajustées pour s'assurer qu'elles se situent dans le rectangle :
+Les valeurs de $k_1$ et $k_2$ sont ajustées (pour s'assurer qu'elles se situent bien dans le rectangle) :
 \begin{itemize}
     \item Si $k_1 < 0$, alors $k_1 = 0$.
     \item Si $k_1 > l$, alors $k_1 = l$.
@@ -456,8 +458,7 @@ Pour cette simulation on obtient un temps moyen de \textbf{30.36 unités de temp
 \includegraphics[width=\textwidth]{resultat_2.png} % moitié de la largeur du texte
 
 On obtien une moyenne de temps sur 10 échentillons pour la classe avec 2 portes de 10.96 unité de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
-\paragraph{Conclusion} Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire augmente le risque de blessure, en particulier en cas de panique ou de mouvements de foule désorganisés. \\ \indent A noter que notre model aurait pu être plus proche de la réalité en ajoutant le principe de décision individuel pour avoir des chemins différents.
-
+\paragraph{Conclusion}  Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire est un risque, en particulier en cas de panique ou de mouvements de foule. \\ \indent A noter que notre model aurait pu être plus proche de la réalité en ajoutant le principe de décision individuel pour avoir des chemins différents.
 \newpage
 
 
