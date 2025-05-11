@@ -199,7 +199,7 @@ L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
 
 \subsubsection{Présentation du code}
 
-Voici un exemple pour resoudre l'equation différentiel suivante (force motrice):
+Voici un exemple pour résoudre l'équation différentielle suivante (force motrice):
 
 \begin{equation}
 \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} = \frac{d\vec{v}}{dt}
@@ -207,19 +207,19 @@ Voici un exemple pour resoudre l'equation différentiel suivante (force motrice)
 
 \newpage
 
-\textbf{Le code qui permet de resoudre donc l'equation differentiel:}
+\textbf{Le code qui permet de resoudre l'équation différentielle :}
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
 def euler(tab_personne, personne,indice, step=.02):
 
     
-    f_totale = force_motrice(personne) #cacul de la force motrice
+    f_totale = force_motrice(personne) #calcule de la force motrice
 
-    #projection sur Ux et Uy
+    # Projection sur Ux et Uy
     vitesse_x =  personne["vitesse"][0] + step * f_totale[0]
     vitesse_y = personne["vitesse"][1] + step * f_totale[1]
     
-    #on actualise la position
+    # Actualisation de la position
     personne["position"] = np.array( [
         personne["position"][0] + vitesse_x,
         personne["position"][1] + vitesse_y 
@@ -232,14 +232,14 @@ def euler(tab_personne, personne,indice, step=.02):
     ])
 \end{minted}
 
-\noindent Dans les premières lignes on calcul la force totale.
+\noindent Dans les premières lignes on calcule la force totale.
 
 \noindent Puis on applique la méthode d'euler:
 \begin{equation}
     \vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot \vec{F_{totale}}
 \end{equation}
 
-\noindent Pour chaque direction $(0_y)$ et $(0_x)$ on projette pour avoir la vitesse en composante respective x et y. (ligne 8 et 9), ici $\Delta t = 0.02$ ce qui minimise la marge d'erreur.
+\noindent Pour chaque direction $(O_y)$ et $(O_x)$ on projette pour avoir la vitesse en composante respective x et y. (ligne 8 et 9), ici $\Delta t = 0.02$ ce qui minimise la marge d'erreur.
 
 \
 
@@ -247,19 +247,19 @@ def euler(tab_personne, personne,indice, step=.02):
 
 \subsubsection{Résultat graphique}
 \
-On lance le progamme, sur une particule on recupère les diverses valeurs de $V_n$ pour en suite tracer la courbe si dessous (la paricule démarre à la position $(0,0)$ et vise le point $(100,100)$:
+On lance le progamme avec une unique personne dont on recupère les diverses valeurs de $v_n$ pour ensuite tracer la courbe ci-dessous (la particule démarre à la position $(0,0)$ et vise le point $(100,100)$:
 
 
 \includegraphics[width=\textwidth]{graph_vitesse.png} % moitié de la largeur du texte
 
-Le résultat est bien cohérent on voit que la particule atteint à la manière d'une exponentielle inversé sa $v_{desiree}$ pour en suite l'atteindre totale. Dès que la position $(100,100)$ est atteinte sa vitesse décroit pour revenir vers la position. On voit qu'en suite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
+Le résultat est bien cohérent : on voit que la particule atteint $v_{desiree}$ à la manière d'une exponentielle inversée. Dès que la position $(100,100)$ est atteinte sa vitesse décroit pour revenir vers la position. On voit qu'ensuite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
 
 
-\subsection*{Méthode de Runge-Kutta d'ordre 2}
+\subsection*{Méthode de Runge-Kutta d'ordre 2 et 4}
 
-Cette méthode plus couteuse temporellement s'avére être plus précise qu'euler.
+Ces méthodes plus coûteuses temporellement s'avèrent être plus précise qu'Euler. Le code est sensiblement différent.
 
-L’équation générale est :
+Pour l'ordre 2 l'équation générale est :
 \[
 \vec{v}_{n+1} = \vec{v}_n + k_2
 \]
@@ -270,6 +270,23 @@ k_1 = h \cdot \vec{F}(\vec{v}_n, \vec{r}_n)
 \[
 k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
 \]
+Pour l'ordre 4 l'équation générale est :
+\[
+\vec{v}_{n+1} = \vec{v}_n + \frac{1}{6}(k_1+2k_2+2k_3+k_4)
+\]
+avec :
+\[
+k_1 = h \cdot \vec{F}(\vec{v}_n, \vec{r}_n)
+\]
+\[
+k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
+\]
+\[
+k_3 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_2, \vec{r}_n \right)
+\]
+\[
+k_4 = h \cdot \vec{F} \left( \vec{v}_n + k_3, \vec{r}_n \right)
+\]
 
 \textbf{Dans le code :}
 \begin{itemize}
@@ -278,6 +295,7 @@ k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
     \[
     k_1 = h \cdot \texttt{resultante(tab\_personne, personne, indice, obstacles, portes)}
     \]
+    où \texttt{resultante} calcule la somme de toutes les forces appliquées.
     \item Puis on modifie temporairement la vitesse :
     \[
     \vec{v} \mathrel{+}= \frac{1}{2} k_1
@@ -291,12 +309,13 @@ k_2 = h \cdot \vec{F} \left( \vec{v}_n + \frac{1}{2}k_1, \vec{r}_n \right)
     \vec{v}_{n+1} = \vec{v}_n + k_2
     \]
 \end{itemize}
+On fait l'ordre 4 de manière analogue.
 
-\subsubsection{Resultats de rungge kutta 2 et 4}
+\subsubsection{Resultats de Runge-Kutta 2 et 4}
 
 \includegraphics[width=\textwidth]{runge.png}
 
-Au final, on observe un léger écart, dû à la plus grande précision de la méthode de Runge-Kutta. Mais cette écart sur la vitesse n'a pas un grans impact sur la position à en croire le graphique suivant:
+Au final, on observe un léger écart dû à la plus grande précision de la méthode de Runge-Kutta. Mais cette écart sur la vitesse n'a pas un grand impact sur la position à en croire le graphique suivant:
 
 \includegraphics[width=\textwidth]{runge_pos.png}
 
@@ -308,7 +327,9 @@ Au final, on observe un léger écart, dû à la plus grande précision de la m�
 \begin{itemize}
 	\item \textbf{main.py} s'occupe de dessiner la fênetre de gérer plusieurs actions il initialise le tableau de personne (tableau de particule)
 	
-	\item \textbf{physique.py} contient uniquement des fonction pour la gestion physique
+	\item \textbf{physique.py} contient uniquement des fonction pour la gestion des phénomènes physiques
+
+ 	\item \textbf{affichage.py} concerne l'affichage des éléments de la simulation
 \end{itemize}
 
 \subsection{Modélisation physique}
