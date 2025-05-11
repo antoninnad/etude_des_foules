@@ -84,12 +84,15 @@
 
 \setcounter{page}{1} % -- met la page à 1 --
 
-\section{Objectif}
+\section{Objectifs}
 \subsection{Situation 1}
-\indent La première situation (imposée) dans le cadre de cette étude, consiste à modéliser l’évacuation d’une foule depuis un espace rectangulaire, tel qu’une salle. Les individus se dirigent vers une sortie sous l'effet d'une force motrice, tout en interagissant les uns avec les autres par le biais de forces sociales. Chaque individu est associé à une vitesse cible, représentant son intention de déplacement. L'objectif est d'avoir le temps d'évacuation totale pour la foulle. Dans cette simulation le nombre de personne est fixé à 45.
+\indent La première situation (imposée) dans le cadre de cette étude, consiste à modéliser l’évacuation d’une foule depuis un espace rectangulaire, tel qu’une salle. Les individus se dirigent vers une sortie sous l'effet d'une force motrice, tout en interagissant les uns avec les autres par le biais de forces sociales. Chaque individu est associé à une vitesse cible, représentant son intention de déplacement. L'objectif est d'avoir le temps d'évacuation totale de la foule. Dans cette simulation le nombre de personne est fixé à 45.
 
 \subsection{Situation 2}
-\indent On repart sur les bases de la situation une, mais cette fois dans deux salles de cour. Les deux salles sont exactement identique à la différence que la salle 1 a une porte et que la salle 2 a deux portes. Le nombre d'individu (étudiant + éléve) est de 31. Notre objectif est de voir si la porte en plus est vraiment utile.
+\indent On repart sur les bases de la situation une, mais cette fois dans deux salles de cours. Les deux salles sont exactement identique à la différence que la salle 1 a une porte et que la salle 2 a deux portes. Le nombre total d'individu est de 31. Notre objectif est de voir si la porte en plus est vraiment utile.
+
+\subsection{Situation 3}
+\indent La troisième simulation proposée a pour objectif de vérifier le temps d'évacuation lorsqu'il y a un obstacle devant la sortie. En effet, nous avons vu en cours que ce temps devrait être plus court. Cette simulation reprend les conditions de la première (nombre d'individus, configuration de la salle...) 
 
 \
 \section{Théorie sous-jacente}
@@ -97,32 +100,48 @@
 Le modèle de force sociale, introduit par Helbing et Molnár\footnote{\url{https://doi.org/10.1103/PhysRevE.51.4282}}, vise à simuler le comportement de piétons dans des environnements denses, en représentant chaque individu comme une particule soumise à des forces comportementales. Deux forces fondamentales structurent ce modèle : la force motrice et la force sociale.
 
 \paragraph{Force motrice.}
-Chaque individu $i$ cherche à atteindre une vitesse souhaitée $\vec{v}_i^0$ dans une direction donnée. Ce comportement est modélisé par une force motrice, qui pousse l'individu à ajuster sa vitesse actuelle $\vec{v}_i$ à sa vitesse désirée, selon :
+Chaque individu $i$ cherche à atteindre une vitesse souhaitée $\vec{v}_i^0$ dans une direction donnée. Ce comportement est modélisé par une force motrice, qui pousse l'individu à ajuster sa vitesse actuelle $\vec{v}_i$ pour atteindre la vitesse désirée dans la direction souhaitée. Cette force est exprimée par la formule suivante :
 
 \begin{equation}
 \label{eq:force_motrice}
 \vec{f}_i^{\text{m}} = m_i \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i}
 \end{equation}
 
-où $m_i$ est la masse de l'individu et $\tau_i$ est un temps de relaxation caractérisant la rapidité avec laquelle l'individu tente d’atteindre sa vitesse cible.
+où $m_i$ est la masse de l'individu en kilogrammes (kg) et $\tau_i$ est un temps caractéristique exprimé en secondes (s) représentant la rapidité avec laquelle un individu souhaite à atteindre sa vitesse désirée.
 
 \paragraph{Force sociale.}
-Outre la volonté individuelle de se diriger vers une destination, les piétons interagissent entre eux via des forces dites sociales, traduisant leur tendance à maintenir une distance interpersonnelle. Ces interactions sont modélisées par une force répulsive de la forme :
+Outre la volonté individuelle de se diriger vers un point précis, les piétons interagissent entre eux via des forces dites sociales, traduisant leur tendance à maintenir une distance interpersonnelle dans un simple objectif de confort. Ces interactions sont modélisées par une force répulsive de la forme :
 
 \begin{equation}
-\label{eq:force_sociale}
+\label{eq:force_sociale (individu-individu}
 \vec{f}_{ij}^{\text{s}} = A_i \exp\left(\frac{r_{ij} - d_{ij}}{B_i}\right) \vec{n}_{ij}
 \end{equation}
 
 où :
 \begin{itemize}
-  \item  $B_i$ est une constantes positives liée à la zone de confort de la personne i,
-  \item $r_{ij}$ est la somme des rayons corporels des individus $i$ et $j$,
-  \item $d_{ij}$ est la distance entre les centres de masse des deux individus,
+  \item $A_i$ est un constante positive pondérant cette force
+  \item  $B_i$ (en centimètres) est une constantes positives représentant la distance de confort de la personne i,
+  \item $r_{ij}$ (en centimètres) est la somme des rayons corporels des individus $i$ et $j$,
+  \item $d_{ij}$ (en centimètres) est la distance entre les centres de masse des deux individus,
   \item $\vec{n}_{ij}$ est le vecteur unitaire pointant de $j$ vers $i$.
 \end{itemize}
 
-Ces forces permettent de simuler des comportements réalistes d’évitement et de gestion de l’espace dans des environnements contraints, comme lors d’une évacuation.
+Une seconde force sociale d'expression semblable va servir à représenter l'influence répulsive d'un obstacle sur un individu:
+
+\begin{equation}
+\label{eq:force_sociale (obstacle-individu}
+\vec{f}_{io}^{\text{s}} = C_i \exp\left(\frac{- d_{io}}{B_i}\right) \vec{n}_{io}
+\end{equation}
+
+où pour o le point de l'obstacle le plus proche de l'individu :
+\begin{itemize}
+  \item $C_i$ est un constante positive pondérant cette force
+  \item  $B_i$ (en centimètres) est une constantes positives représentant la distance de confort de la personne i,
+  \item $d_{io}$ (en centimètres) est la distance la plus courte entre la personne et l'obstacle,
+  \item $\vec{n}_{io}$ est le vecteur unitaire pointant de $o$ vers $i$ dirigé selon (oi).
+\end{itemize}
+
+Ces forces permettent de simuler des comportements réalistes d’évitement et de gestion de l’espace dans des environnements contraints, comme lors d’une évacuation. Elles vont en particulier nous permettre d'établir une équation diférentielle régissant la vitesse des individus, équation qui nous permettra par des moyens de résolution numérique de simuler les comportements souhaités.
 
 
 \section{Méthode}
