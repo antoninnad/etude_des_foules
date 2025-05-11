@@ -144,7 +144,7 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 
 \subsection{Determiner l'équation}
 
-\indent On considère un individu i de la population étudiée et on se place dans un référentiel terrestre supposé galiléen. Les forces retenues dans ce cas sont celles citées dans la partie précédente (motrice et sociales). On applique la seconde loi de Newton à l'individu considéré : $\sum \vec{F}_{\text{particule}} = m_{\text{particule}} \vec{a}$.
+\indent On considère un individu i de la population étudiée et on se place dans un référentiel terrestre supposé galiléen. Les forces retenues dans ce cas sont celles citées dans la partie précédente (motrice et sociales). On applique la seconde loi de Newton à l'individu considéré : $\sum \vec{F}_{\text{personne}} = m_{\text{personne}} \vec{a}$.
 \\On a alors :
 \[
 \vec{f}_{\text{motrice}} + \vec{f}_{\text{sociale}} = m_{\text{personne}} \frac{d\vec{v}}{dt}.
@@ -157,7 +157,7 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 \end{equation}
 où \Omega représente l'ensemble des obstacles.
 
-\subsection{Resolution d'équation différentielle}
+\subsection{Résolution d'équation différentielle}
 \subsubsection{Contextualisation}
 
 \indent Pour résoudre \eqref{eq:eq_diff}, nous allons utiliser trois méthodes différentes. La première est la méthode d'Euler : 
@@ -165,7 +165,7 @@ où \Omega représente l'ensemble des obstacles.
 \vec{v}_{n+1} = \vec{v}_n + \Delta t \cdot frac{d\vec{v}}{dt}
 \]
 L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
-\\ On introduit une personne modélisée en Python par un dictionnaire (pour mieux comprendre  la fonction qui permet de résoudre cette équation) :
+\\ On introduit une personne modélisée en Python par un dictionnaire (pour mieux comprendre la fonction qui permet de résoudre cette équation) :
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
 {
@@ -184,11 +184,11 @@ L'expression de frac{d\vec{v}}{dt} nous est donnée en \eqref{eq:eq_diff}
     
     \item \texttt{"masse"} : La masse de la personne, ici fixée à 10 (arbitrairement).
     
-    \item \texttt{"vitesse\_desiree"} : La vitesse désirée que la personne souhaite atteindre, (par défaut 1.34 $ms^{-1}$).
+    \item \texttt{"vitesse\_desiree"} : La vitesse désirée que la personne souhaite atteindre (par défaut 1.34 $ms^{-1}$).
     
-    \item \texttt{"vitesse"} : Un tableau NumPy qui représente la vitesse initiale de la personne. La vitesse initiale est définie comme un vecteur nul \([0, 0]\) (immobile au départ)
+    \item \texttt{"vitesse"} : Un tableau NumPy qui représente la vitesse initiale de la personne. La vitesse initiale est définie comme un vecteur nul \([0, 0]\) (immobile au départ).
     
-    \item \texttt{"tau"} : Un paramètre fixé à 0.2. Il représente lemps que mis pour atteindre \texttt{"vitesse\_desiree"}.
+    \item \texttt{"tau"} : Un paramètre fixé à 0.5. Il représente le temps mis pour atteindre \texttt{"vitesse\_desiree"}.
     
     \item \texttt{"rayon"} : Le rayon de la personne (representée comme un cercle), calculé comme 10 plus un nombre aléatoire compris entre -2 et 2. 
 \end{itemize}
@@ -203,7 +203,7 @@ Voici un exemple pour résoudre l'équation différentielle suivante (force motr
 
 \newpage
 
-\textbf{Le code qui permet de resoudre l'équation différentielle :}
+\textbf{Le code qui permet de résoudre l'équation différentielle :}
 
 \begin{minted}[frame=single, bgcolor=white, linenos]{python}
 def euler(tab_personne, personne,indice, step=.02):
@@ -248,7 +248,7 @@ On lance le progamme avec une unique personne dont on recupère les diverses val
 
 \includegraphics[width=\textwidth]{graph_vitesse.png} % moitié de la largeur du texte
 
-Le résultat est bien cohérent : on voit que la particule atteint $v_{desiree}$ à la manière d'une exponentielle inversée. Dès que la position $(100,100)$ est atteinte sa vitesse décroit pour revenir vers la position. On voit qu'ensuite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
+Le résultat est bien cohérent : on voit que la particule atteint $v_{desiree}$ à la manière d'une exponentielle inversée. Dès que la position $(100,100)$ est atteinte sa vitesse décroît pour revenir vers la position. On voit qu'ensuite la fonction devient périodique, la particule passe d'un bout à l'autre de la position (100,100) sans jamais l'atteindre.
 
 
 \subsection*{Méthode de Runge-Kutta d'ordre 2 et 4}
@@ -307,7 +307,7 @@ k_4 = h \cdot \vec{F} \left( \vec{v}_n + k_3, \vec{r}_n \right)
 \end{itemize}
 On fait l'ordre 4 de manière analogue.
 
-\subsubsection{Resultats de Runge-Kutta 2 et 4}
+\subsubsection{Résultats de Runge-Kutta 2 et 4}
 
 \includegraphics[width=\textwidth]{runge.png}
 
