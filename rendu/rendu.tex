@@ -155,7 +155,7 @@ Ces forces permettent de simuler des comportements réalistes d’évitement et 
 \label{eq:eq_diff}
 \frac{d\vec{v}}{dt} = \frac{\vec{v}_i^0 - \vec{v}_i}{\tau_i} + \frac{1}{m_{\text{personne}}}( \sum_{j \neq i}  A_i \exp\left( \frac{r_{ij} - d_{ij}}{B_i} \right) \vec{n}_{ij} +  \sum_{\Omega} C_i \exp\left( \frac{- d_{io}}{B_i} \right) \vec{n}_{io})
 \end{equation}
-où \Omega représente l'ensemble des obstacles.
+où $\Omega$ représente l'ensemble des obstacles.
 
 \subsection{Résolution d'équation différentielle}
 \subsubsection{Contextualisation}
@@ -443,7 +443,7 @@ Cette fonction établit le bilan des quatre forces considérées :
 	\item \textbf{forces interactions murs} \eqref{eq:force_sociale}
  	\item \textbf{forces interactions obstacles} \eqref{eq:force_sociale}
 \end{itemize}
-et renvoie la résultante de ces forces. Elle est utilisée lors de la résolution numérique de l'équation par les fonctions \texttt{"euler"}, \texttt{"runge_kutta_2"} et \texttt{"runge_kutta_4"} qui ont déjà été présentées.
+et renvoie la résultante de ces forces. Elle est utilisée lors de la résolution numérique de l'équation par les fonctions \texttt{"euler"}, \texttt{"runge\_kutta\_2"} et \texttt{"runge\_kutta\_4"} qui ont déjà été présentées.
 
 \section{Analyse}
 Le temps de notre rendu est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dues à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
