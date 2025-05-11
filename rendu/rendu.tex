@@ -324,9 +324,9 @@ Cependant, lorsqu'on considère plusieurs personnes et leurs interactions, la di
 \subsection{Structure et contextualisation}
 \noindent Le code est divisé en trois modules distincts:
 \begin{itemize}
-	\item \textbf{main.py} s'occupe de dessiner la fênetre de gérer plusieurs actions il initialise le tableau de personne (tableau de particule)
+	\item \textbf{main.py} s'occupe de dessiner la fênetre de gérer plusieurs actions. Il initialise le tableau de personne (tableau de particule)
 	
-	\item \textbf{physique.py} contient uniquement des fonction pour la gestion des phénomènes physiques
+	\item \textbf{physique.py} contient uniquement des fonctions pour la gestion des phénomènes physiques
 
  	\item \textbf{affichage.py} concerne l'affichage des éléments de la simulation
 \end{itemize}
@@ -356,19 +356,17 @@ La fonction \textbf{calcul\_i0} retourne le vecteur directionnel en soustrayant 
 def force_interaction_social(tab_personne, personne, indice, b0=config["b0"], seuil_interaction=50)
 \end{minted}
 
-Pour caculer on applique \eqref{eq:force_sociale}
+Pour calculer on applique \eqref{eq:force_sociale}
 \\
 
 Afin de limiter la complexité temporelle de la simulation, on ajoute deux conditions : une personne ne peut pas interagir avec elle-même (ce qui est logique d’un point de vue physique), et elle n’interagit qu’avec les autres personnes situées à moins de 50 unités de distance.  Ce seuil d’interaction (fixé à 50) est vérifié physiquement : au-delà de cette distance, l’influence sociale devient négligeable. A noté que cette valeur a été fixé expérimentalement.
 
 
-Pour calculer $d_{ij}$ on prend la norme de la différence des vecteurs positions de la personne considérée et de la personne avec laquelle il y a interaction. Il faut également penser à soustraire les distances représentants les deux rayons qui correspond à $r_{ij}$ avant de normer. $\vec{n_{ij}}$ est le vecteur normal de $j$ vers $i$ qu'on norme pour avoir un vecteur unitaire. 
+Pour calculer $d_{ij}$ on prend la norme de la différence des vecteurs positions de la personne considérée et de la personne avec laquelle il y a interaction. Il faut également penser à soustraire la distance représentant les deux rayons qui correspond à $r_{ij}$ avant de normer. $\vec{n_{ij}}$ est le vecteur normal de $j$ vers $i$ qu'on norme pour avoir un vecteur unitaire. 
 
 
 \subsubsection{Force répulsion mur}
-La force de repulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agis sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois-ci on utilise pythagore.
-
-\
+La force de répulsion de mur est plus compliquée à calculer. Il faut la calculer pour chaque mur avec toujours un seuil d'intéraction (un mur agit sur nous que s'il nous touche). \textbf{$r_{ij}$} reste le même. Mais pour caculer \textbf{$d_{ij}$} cette fois-ci on utilise pythagore.
 L'action des murs est évidemment supprimée là où se trouvent les portes.
 \
 La fonction \texttt{distance\_mur\_vect} utilise le théorème de Pythagore. Elle renvoie un tuple contenant la distance avec le mur visé ($\mathbf{d_{ij}}$), ainsi que le vecteur normal ($\mathbf{n_{io}}$). Ces informations permettent alors de calculer la force de répulsion avec la formule classique \eqref{eq:force_sociale}.
@@ -432,7 +430,7 @@ Le point le plus proche sur le rectangle est donc :
 
 Pour finir on applique \eqref{eq:force_sociale} ici $r_{ij}$ = $r_i$ - 0 car pas de rayon.
 
-\subsubsection{Resultante}
+\subsubsection{Résultante}
 
 \begin{minted}[frame=single, bgcolor=white, linenos, breaklines=true]{python}
 def resultante(tab_personne, personne,indice,obstacles, portes, evacuation)
@@ -447,16 +445,8 @@ Cette fonction établit le bilan des quatre forces considérées :
 \end{itemize}
 et renvoie la résultante de ces forces. Elle est utilisée lors de la résolution numérique de l'équation par les fonctions \texttt{"euler"}, \texttt{"runge_kutta_2"} et \texttt{"runge_kutta_4"} qui ont déjà été présentées.
 
-\\
-\\
-\textbf{donc au final on obtient une fonction euler qui généralise les deux cas}
-\\
-\\
-On revient à l'equa dif: \eqref{eq:eq_diff}, en utilisant euler
-
-
 \section{Analyse}
-Le temps de notre rendu est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dû à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
+Le temps de notre rendu est en unités de temps il ne dépend pas de la puissance de l'ordinateur pour un résultat plus fiable c'est seulement un incrément à chaque étape de la modélisation. Les différences observées sont dues à la vitesse qui varie de $1.34 \pm 0.25 m.s^{-1}$
 \subsection{Situation 1}
 
 \includegraphics[width=\textwidth]{resultat.png} % moitié de la largeur du texte
@@ -469,8 +459,8 @@ Pour cette simulation on obtient un temps moyen de \textbf{30.36 unités de temp
 
 \includegraphics[width=\textwidth]{resultat_2.png} % moitié de la largeur du texte
 
-On obtient une moyenne de temps sur 10 échantillons pour la classe avec 2 portes de 10.96 unité de temps tandis qu'avec 1 porte la moyenne est de 17.25 unité de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas ou il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
-\paragraph{Conclusion} Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire augmente le risque de blessure, en particulier en cas de panique ou de mouvements de foule désorganisés. \\ \indent De plus, notre modèle reste très éloigné de la réalité. En effet, il néglige et omet beaucoup de principes fondamentaux tels que le prise de décisions individuelles ou encore l'anticipation. Il s'agit donc d'un modèle de Helbing très simplifié qui permet toutefois d'observer la structure générale d'un foule.
+On obtient une moyenne de temps sur 10 échantillons pour la classe avec deux portes de 10.96 unités de temps tandis qu'avec une porte la moyenne est de 17.25 unités de temps. Pour ramener sur une echelle plus parlante que des unités de temps dans le cas où il y a seulement une porte le temps sera augmenté d'environ \textbf{61\%}. 
+\paragraph{Conclusion} Une telle augmentation peut avoir des conséquences critiques en situation d'urgence, car chaque seconde supplémentaire augmente le risque de blessure, en particulier en cas de panique ou de mouvements de foule désorganisés. \\ \indent Cependant, notre modèle reste encore très éloigné de la réalité. En effet, il néglige et omet beaucoup de principes fondamentaux tels que le prise de décisions individuelles ou encore l'anticipation. Il s'agit donc d'un modèle de Helbing très simplifié qui permet toutefois d'observer la structure générale d'un foule.
 
 \newpage
 
